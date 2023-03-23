@@ -38,14 +38,21 @@ def _parse_arguments(desc, args):
     """
     parser = argparse.ArgumentParser(description=desc,
                                      formatter_class=Formatter)
+    parser.add_argument('outdir', help='Output directory')
+    parser.add_argument('--input', required=True,
+                        help='Input edgelist file')
+    parser.add_argument('--dimensions', type=int, default=1024,
+                        help='Size of embedding to generate')
+    parser.add_argument('--p', type=int, default=2,
+                        help='--p value to pass to node2vec')
+    parser.add_argument('--q', type=int, default=1,
+                        help='--q value to pass to node2vec')
     parser.add_argument('--logconf', default=None,
                         help='Path to python logging configuration file in '
                              'this format: https://docs.python.org/3/library/'
                              'logging.config.html#logging-config-fileformat '
                              'Setting this overrides -v parameter which uses '
                              ' default logger. (default None)')
-    parser.add_argument('--exitcode', help='Exit code this command will return',
-                        default=0, type=int)
     parser.add_argument('--verbose', '-v', action='count', default=0,
                         help='Increases verbosity of logger to standard '
                              'error for log messages in this module. Messages are '
@@ -106,7 +113,11 @@ def main(args):
 
     try:
         _setup_logging(theargs)
-        return CellmapsnetworkembeddingRunner(theargs.exitcode).run()
+        return CellmapsnetworkembeddingRunner(edgelist=theargs.input,
+                                              outdir=theargs.outdir,
+                                              dimensions=theargs.dimensions,
+                                              p=theargs.p,
+                                              q=theargs.q).run()
     except Exception as e:
         logger.exception('Caught exception: ' + str(e))
         return 2
