@@ -6,7 +6,7 @@
 import os
 
 import unittest
-from cellmaps_network_embedding import {{ cookiecutter.project_slug }}cmd
+from cellmaps_network_embedding import cellmaps_network_embeddingcmd
 
 SKIP_REASON = 'CELLMAPS_NETWORK_EMBEDDING_INTEGRATION_TEST ' \
               'environment variable not set, cannot run integration ' \

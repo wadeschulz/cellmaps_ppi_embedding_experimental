@@ -1,6 +1,6 @@
-============================
-CM4AI Network Embedding Tool
-============================
+==========================
+cellmaps_network_embedding
+==========================
 
 
 .. image:: https://img.shields.io/pypi/v/cellmaps_network_embedding.svg
@@ -16,7 +16,7 @@ CM4AI Network Embedding Tool
 
 
 
-Uses original node2vec to generate network embedding of edgelist
+Python Boilerplate contains all the boilerplate you need to create a Python package with command line
 
 
 * Free software: MIT license
@@ -42,7 +42,7 @@ Installation
    git clone https://github.com/idekerlab/cellmaps_network_embedding
    cd cellmaps_network_embedding
    make dist
-   pip install dist/{{ cookiecutter.project_slug }}cmd*whl
+   pip install dist/cellmaps_network_embeddingcmd*whl
 
 
 Run **make** command with no arguments to see other build/deploy options including creation of Docker image 
@@ -103,7 +103,7 @@ Needed files
 Usage
 -----
 
-For information invoke :code:`{{ cookiecutter.project_slug }}cmd.py -h`
+For information invoke :code:`cellmaps_network_embeddingcmd.py -h`
 
 **Example usage**
 
@@ -111,7 +111,7 @@ For information invoke :code:`{{ cookiecutter.project_slug }}cmd.py -h`
 
 .. code-block::
 
-   {{ cookiecutter.project_slug }}cmd.py # TODO Add other needed arguments here
+   cellmaps_network_embeddingcmd.py # TODO Add other needed arguments here
 
 
 Via Docker
@@ -124,7 +124,7 @@ Via Docker
 
 .. code-block::
 
-   docker run -v `pwd`:`pwd` -w `pwd` coleslawndex/cellmaps_network_embedding:0.1.0 {{ cookiecutter.project_slug }}cmd.py # TODO Add other needed arguments here
+   docker run -v `pwd`:`pwd` -w `pwd` idekerlab/cellmaps_network_embedding:0.1.0 cellmaps_network_embeddingcmd.py # TODO Add other needed arguments here
 
 
 Credits

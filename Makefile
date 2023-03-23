@@ -92,8 +92,8 @@ install: clean ## install the package to the active Python's site-packages
 
 dockerbuild: ## build docker image and store in local repository
 	@cv=`grep '__version__' cellmaps_network_embedding/__init__.py | sed "s/^.*= *'//" | sed "s/'.*//"`; \
-	docker build -t coleslawndex/cellmaps_network_embedding:$$cv -f docker/Dockerfile .
+	docker build -t idekerlab/cellmaps_network_embedding:$$cv -f docker/Dockerfile .
 
 dockerpush: ## push image to dockerhub
 	@cv=`grep '__version__' cellmaps_network_embedding/__init__.py | sed "s/^.*= *'//" | sed "s/'.*//"`; \
-	docker push coleslawndex/cellmaps_network_embedding:$$cv
+	docker push idekerlab/cellmaps_network_embedding:$$cv

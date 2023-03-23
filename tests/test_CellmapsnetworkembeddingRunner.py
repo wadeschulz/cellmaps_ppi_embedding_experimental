@@ -5,10 +5,10 @@
 
 
 import unittest
-from cellmaps_network_embedding.runner import {{ cookiecutter.project_slug.replace('_','').capitalize() }}Runner
+from cellmaps_network_embedding.runner import CellmapsnetworkembeddingRunner
 
 
-class Test{{ Cookiecutter.project_slug.replace('_','').capitalize() }}runner(unittest.TestCase):
+class TestCellmapsnetworkembeddingrunner(unittest.TestCase):
     """Tests for `cellmaps_network_embedding` package."""
 
     def setUp(self):
@@ -19,11 +19,11 @@ class Test{{ Cookiecutter.project_slug.replace('_','').capitalize() }}runner(uni
 
     def test_constructor(self):
         """Tests constructor"""
-        myobj = {{ cookiecutter.project_slug.replace('_','').capitalize() }}Runner(0)
+        myobj = CellmapsnetworkembeddingRunner(0)
 
         self.assertIsNotNone(myobj)
 
     def test_run(self):
         """ Tests run()"""
-        myobj = {{ cookiecutter.project_slug.replace('_','').capitalize() }}Runner(4)
+        myobj = CellmapsnetworkembeddingRunner(4)
         self.assertEqual(4, myobj.run())

@@ -10,6 +10,6 @@ RUN pip install /tmp/cellmaps_network_embedding
 
 RUN rm -rf /tmp/cellmaps_network_embedding
 
-ENTRYPOINT ["/opt/conda/bin/{{ cookiecutter.project_slug }}cmd.py"]
+ENTRYPOINT ["/opt/conda/bin/cellmaps_network_embeddingcmd.py"]
 
 CMD ["--help"]

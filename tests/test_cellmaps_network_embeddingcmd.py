@@ -8,7 +8,7 @@ import tempfile
 import shutil
 
 import unittest
-from cellmaps_network_embedding import {{ cookiecutter.project_slug }}cmd
+from cellmaps_network_embedding import cellmaps_network_embeddingcmd
 
 
 class TestCellmaps_network_embedding(unittest.TestCase):
@@ -22,14 +22,14 @@ class TestCellmaps_network_embedding(unittest.TestCase):
 
     def test_parse_arguments(self):
         """Tests parse arguments"""
-        res = {{ cookiecutter.project_slug }}cmd._parse_arguments('hi', [])
+        res = cellmaps_network_embeddingcmd._parse_arguments('hi', [])
 
         self.assertEqual(res.verbose, 0)
         self.assertEqual(res.exitcode, 0)
         self.assertEqual(res.logconf, None)
 
         someargs = ['-vv', '--logconf', 'hi', '--exitcode', '3']
-        res = {{ cookiecutter.project_slug }}cmd._parse_arguments('hi', someargs)
+        res = cellmaps_network_embeddingcmd._parse_arguments('hi', someargs)
 
         self.assertEqual(res.verbose, 2)
         self.assertEqual(res.logconf, 'hi')
@@ -38,14 +38,14 @@ class TestCellmaps_network_embedding(unittest.TestCase):
     def test_setup_logging(self):
         """ Tests logging setup"""
         try:
-            {{ cookiecutter.project_slug }}cmd._setup_logging(None)
+            cellmaps_network_embeddingcmd._setup_logging(None)
             self.fail('Expected AttributeError')
         except AttributeError:
             pass
 
         # args.logconf is None
-        res = {{ cookiecutter.project_slug }}cmd._parse_arguments('hi', [])
-        {{ cookiecutter.project_slug }}cmd._setup_logging(res)
+        res = cellmaps_network_embeddingcmd._parse_arguments('hi', [])
+        cellmaps_network_embeddingcmd._setup_logging(res)
 
         # args.logconf set to a file
         try:
@@ -75,9 +75,9 @@ args=(sys.stderr,)
 [formatter_formatter]
 format=%(asctime)s %(name)-12s %(levelname)-8s %(message)s""")
 
-            res = {{ cookiecutter.project_slug }}cmd._parse_arguments('hi', ['--logconf',
+            res = cellmaps_network_embeddingcmd._parse_arguments('hi', ['--logconf',
                                                                        logfile])
-            {{ cookiecutter.project_slug }}cmd._setup_logging(res)
+            cellmaps_network_embeddingcmd._setup_logging(res)
 
         finally:
             shutil.rmtree(temp_dir)
@@ -88,7 +88,7 @@ format=%(asctime)s %(name)-12s %(levelname)-8s %(message)s""")
         # try where loading config is successful
         try:
             temp_dir = tempfile.mkdtemp()
-            res = {{ cookiecutter.project_slug }}cmd.main(['myprog.py'])
+            res = cellmaps_network_embeddingcmd.main(['myprog.py'])
             self.assertEqual(res, 0)
         finally:
             shutil.rmtree(temp_dir)

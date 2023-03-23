@@ -63,7 +63,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'CM4AI Network Embedding Tool'
+project = u'cellmaps_network_embedding'
 copyright = u"2023, The Regents of the University of California"
 author = u"Christopher Churas"
 
@@ -159,7 +159,7 @@ latex_elements = {
 # [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'cellmaps_network_embedding.tex',
-     u'CM4AI Network Embedding Tool Documentation',
+     u'cellmaps_network_embedding Documentation',
      u'Christopher Churas', 'manual'),
 ]
 
@@ -170,7 +170,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (master_doc, 'cellmaps_network_embedding',
-     u'CM4AI Network Embedding Tool Documentation',
+     u'cellmaps_network_embedding Documentation',
      [author], 1)
 ]
 
@@ -182,7 +182,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'cellmaps_network_embedding',
-     u'CM4AI Network Embedding Tool Documentation',
+     u'cellmaps_network_embedding Documentation',
      author,
      'cellmaps_network_embedding',
      'One line description of project.',

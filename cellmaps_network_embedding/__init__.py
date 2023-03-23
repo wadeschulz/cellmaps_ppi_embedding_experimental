@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Top-level package for CM4AI Network Embedding Tool."""
+"""Top-level package for cellmaps_network_embedding."""
 
 __author__ = """Christopher Churas"""
 __email__ = 'cchuras@ucsd.edu'

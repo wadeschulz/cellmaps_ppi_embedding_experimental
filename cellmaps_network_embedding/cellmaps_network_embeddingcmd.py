@@ -6,7 +6,7 @@ import logging
 import logging.config
 
 import cellmaps_network_embedding
-from cellmaps_network_embedding.runner import {{ cookiecutter.project_slug.replace('_','').capitalize() }}Runner
+from cellmaps_network_embedding.runner import CellmapsnetworkembeddingRunner
 
 logger = logging.getLogger(__name__)
 
@@ -90,14 +90,14 @@ def main(args):
     :param args: arguments passed to command line usually :py:func:`sys.argv[1:]`
     :type args: list
 
-    :return: return value of :py:meth:`cellmaps_network_embedding.runner.{{ cookiecutter.project_slug.replace('_','').capitalize() }}Runner.run`
+    :return: return value of :py:meth:`cellmaps_network_embedding.runner.CellmapsnetworkembeddingRunner.run`
              or ``2`` if an exception is raised
     :rtype: int
     """
     desc = """
     Version {version}
 
-    Invokes run() method on {{ cookiecutter.project_slug.replace('_','').capitalize() }}Runner
+    Invokes run() method on CellmapsnetworkembeddingRunner
 
     """.format(version=cellmaps_network_embedding.__version__)
     theargs = _parse_arguments(desc, args[1:])
@@ -106,7 +106,7 @@ def main(args):
 
     try:
         _setup_logging(theargs)
-        return {{ cookiecutter.project_slug.replace('_','').capitalize() }}Runner(theargs.exitcode).run()
+        return CellmapsnetworkembeddingRunner(theargs.exitcode).run()
     except Exception as e:
         logger.exception('Caught exception: ' + str(e))
         return 2

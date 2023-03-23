@@ -1,4 +1,4 @@
-Welcome to CM4AI Network Embedding Tool's documentation!
+Welcome to cellmaps_network_embedding's documentation!
 ================================================================
 
 
@@ -15,7 +15,7 @@ Welcome to CM4AI Network Embedding Tool's documentation!
 
 
 
-Uses original node2vec to generate network embedding of edgelist
+Python Boilerplate contains all the boilerplate you need to create a Python package with command line
 
 
 * Free software: MIT license
