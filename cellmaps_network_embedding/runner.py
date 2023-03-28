@@ -5,11 +5,13 @@ import csv
 import random
 import logging
 
+from cellmaps_network_embedding.exceptions import CellMapsNetworkEmbeddingError
+
 
 logger = logging.getLogger(__name__)
 
 
-class CellmapsnetworkembeddingRunner(object):
+class CellMapsNetworkEmbeddingRunner(object):
     """
     Class to run algorithm
     """
@@ -17,11 +19,11 @@ class CellmapsnetworkembeddingRunner(object):
                  outdir=None,
                  p=None,
                  q=None,
-                 dimensions=None):
+                 dimensions=1024):
         """
         Constructor
 
-        :param exitcode: value to return via :py:meth:`.CellmapsnetworkembeddingRunner.run` method
+        :param exitcode: value to return via :py:meth:`.CellMapsNetworkEmbeddingRunner.run` method
         :type int:
         """
         self._edgelist = edgelist
@@ -36,9 +38,21 @@ class CellmapsnetworkembeddingRunner(object):
 
         :return:
         """
+        logger.debug('In run method')
+
+        if self._outdir is None:
+            raise CellMapsNetworkEmbeddingError('outdir must be set')
+
         if not os.path.isdir(self._outdir):
             os.makedirs(self._outdir, mode=0o755)
-        logger.debug('In run method')
+
+        if self._edgelist is None:
+            raise CellMapsNetworkEmbeddingError('edgelist must be set to a file')
+
+        if not os.path.isfile(self._edgelist):
+            raise CellMapsNetworkEmbeddingError('edgelist ' +
+                                                str(self._edgelist) +
+                                                ' is not a file')
 
         uniq_genes = set()
         with open(self._edgelist, 'r') as f:

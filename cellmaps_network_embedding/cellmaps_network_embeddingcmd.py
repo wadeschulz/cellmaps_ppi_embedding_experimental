@@ -6,7 +6,7 @@ import logging
 import logging.config
 
 import cellmaps_network_embedding
-from cellmaps_network_embedding.runner import CellmapsnetworkembeddingRunner
+from cellmaps_network_embedding.runner import CellMapsNetworkEmbeddingRunner
 
 logger = logging.getLogger(__name__)
 
@@ -97,14 +97,14 @@ def main(args):
     :param args: arguments passed to command line usually :py:func:`sys.argv[1:]`
     :type args: list
 
-    :return: return value of :py:meth:`cellmaps_network_embedding.runner.CellmapsnetworkembeddingRunner.run`
+    :return: return value of :py:meth:`cellmaps_network_embedding.runner.CellMapsNetworkEmbeddingRunner.run`
              or ``2`` if an exception is raised
     :rtype: int
     """
     desc = """
     Version {version}
 
-    Invokes run() method on CellmapsnetworkembeddingRunner
+    Invokes run() method on CellMapsNetworkEmbeddingRunner
 
     """.format(version=cellmaps_network_embedding.__version__)
     theargs = _parse_arguments(desc, args[1:])
@@ -113,7 +113,7 @@ def main(args):
 
     try:
         _setup_logging(theargs)
-        return CellmapsnetworkembeddingRunner(edgelist=theargs.input,
+        return CellMapsNetworkEmbeddingRunner(edgelist=theargs.input,
                                               outdir=theargs.outdir,
                                               dimensions=theargs.dimensions,
                                               p=theargs.p,
