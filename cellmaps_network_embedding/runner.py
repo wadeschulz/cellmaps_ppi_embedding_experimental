@@ -4,6 +4,7 @@ import os
 
 import time
 import logging
+import csv
 import networkx as nx
 from node2vec import Node2Vec
 import cellmaps_network_embedding
@@ -29,10 +30,17 @@ class CellMapsNetworkEmbeddingRunner(object):
                  skip_logging=False,
                  misc_info_dict=None):
         """
-        Constructor
 
-        :param exitcode: value to return via :py:meth:`.CellMapsNetworkEmbeddingRunner.run` method
-        :type int:
+        :param nx_network:
+        :param outdir:
+        :param p:
+        :param q:
+        :param dimensions:
+        :param walk_length:
+        :param num_walks:
+        :param workers:
+        :param skip_logging:
+        :param misc_info_dict:
         """
         self._start_time = int(time.time())
         self._end_time = -1
@@ -53,13 +61,14 @@ class CellMapsNetworkEmbeddingRunner(object):
         logger.debug('In constructor')
 
     @staticmethod
-    def get_apms_edgelist_file(input_dir=None):
+    def get_apms_edgelist_file(input_dir=None,
+                               edgelist_filename='apms_edgelist.tsv'):
         """
 
         :param input_dir:
         :return:
         """
-        return os.path.join(input_dir, 'apms_edgelist.tsv')
+        return os.path.join(input_dir, edgelist_filename)
 
     def _write_task_start_json(self):
         """
@@ -94,9 +103,11 @@ class CellMapsNetworkEmbeddingRunner(object):
         except nx.NetworkXError as ne:
             logger.debug('No edge named geneA -> geneB to remove' + str(ne))
 
+        self._nx_network.remove_nodes_from(['geneA', 'geneB'])
+
     def run(self):
         """
-        Fake tool that generates fake embeddings
+        Run node2vec to create embeddings
 
 
         :return:
@@ -130,6 +141,17 @@ class CellMapsNetworkEmbeddingRunner(object):
             # Embed nodes
             model = n2v_obj.fit(window=10, min_count=0, sg=1, epochs=1)
             model.wv.save_word2vec_format(temp_out_file)
+            model.save(os.path.join(self._outdir, 'word2vec.model'))
+            with open(os.path.join(self._outdir, 'apms_emd.tsv'), 'w', newline='') as f:
+                writer = csv.writer(f, delimiter='\t')
+                header_line = ['']
+                header_line.extend([x for x in range(1, self._dimensions)])
+                writer.writerow(header_line)
+                for key in model.wv.index_to_key:
+                    row = [key]
+                    row.extend(model.wv[key].tolist())
+                    writer.writerow(row)
+
             exitcode = 0
             return exitcode
         finally:
