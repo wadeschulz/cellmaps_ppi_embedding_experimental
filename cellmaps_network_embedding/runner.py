@@ -1,12 +1,13 @@
 #! /usr/bin/env python
 
 import os
-import sys
-import csv
-import random
-import logging
-import subprocess
 
+import time
+import logging
+import networkx as nx
+from node2vec import Node2Vec
+import cellmaps_network_embedding
+from cellmaps_utils import logutils
 from cellmaps_network_embedding.exceptions import CellMapsNetworkEmbeddingError
 
 
@@ -17,43 +18,81 @@ class CellMapsNetworkEmbeddingRunner(object):
     """
     Class to run algorithm
     """
-    def __init__(self, edgelist=None,
+    def __init__(self, nx_network=None,
                  outdir=None,
-                 p=None,
-                 q=None,
+                 p=2,
+                 q=1,
                  dimensions=1024,
-                 pythonbinary='/opt/conda/bin/python',
-                 node2vec='/opt/node2vec/src/main.py'):
+                 walk_length=80,
+                 num_walks=10,
+                 workers=8,
+                 skip_logging=False,
+                 misc_info_dict=None):
         """
         Constructor
 
         :param exitcode: value to return via :py:meth:`.CellMapsNetworkEmbeddingRunner.run` method
         :type int:
         """
-        self._edgelist = edgelist
+        self._start_time = int(time.time())
+        self._end_time = -1
+        self._misc_info_dict = misc_info_dict
+        self._nx_network = nx_network
         self._outdir = outdir
         self._dimensions = dimensions
         self._p = p
         self._q = q
-        self._node2vec = node2vec
-        self._pythonbinary = pythonbinary
+        self._walk_length = walk_length
+        self._num_walks = num_walks
+        self._workers = workers
+        if skip_logging is None:
+            self._skip_logging = False
+        else:
+            self._skip_logging = skip_logging
+
         logger.debug('In constructor')
 
-    def _run_cmd(self, cmd):
+    @staticmethod
+    def get_apms_edgelist_file(input_dir=None):
         """
-        Runs hidef command as a command line process
-        :param cmd_to_run: command to run as list
-        :type cmd_to_run: list
-        :return: (return code, standard out, standard error)
-        :rtype: tuple
+
+        :param input_dir:
+        :return:
         """
-        p = subprocess.Popen(cmd,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
+        return os.path.join(input_dir, 'apms_edgelist.tsv')
 
-        out, err = p.communicate()
+    def _write_task_start_json(self):
+        """
+        Writes task_start.json file with information about
+        what is to be run
 
-        return p.returncode, out, err
+        """
+        data = {'p': str(self._p),
+                'q': str(self._q),
+                'walk_length': str(self._walk_length),
+                'num_walks': str(self._num_walks),
+                'dimensions': str(self._dimensions),
+                'workers': str(self._workers)}
+
+        if self._misc_info_dict is not None:
+            data.update(self._misc_info_dict)
+
+        logutils.write_task_start_json(outdir=self._outdir,
+                                       start_time=self._start_time,
+                                       version=cellmaps_network_embedding.__version__,
+                                       data=data)
+
+    def _remove_header_edge_from_network(self):
+        """
+        Removes edge named geneA geneB which is actually the
+        header of the edge list file
+
+        """
+        # remove geneA geneB edge cause it is the header of file
+        try:
+            self._nx_network.remove_edge('geneA', 'geneB')
+        except nx.NetworkXError as ne:
+            logger.debug('No edge named geneA -> geneB to remove' + str(ne))
 
     def run(self):
         """
@@ -63,77 +102,41 @@ class CellMapsNetworkEmbeddingRunner(object):
         :return:
         """
         logger.debug('In run method')
+        try:
+            exitcode = 99
 
-        if self._outdir is None:
-            raise CellMapsNetworkEmbeddingError('outdir must be set')
+            if self._outdir is None:
+                raise CellMapsNetworkEmbeddingError('outdir must be set')
 
-        if not os.path.isdir(self._outdir):
-            os.makedirs(self._outdir, mode=0o755)
+            if not os.path.isdir(self._outdir):
+                os.makedirs(self._outdir, mode=0o755)
 
-        if self._edgelist is None:
-            raise CellMapsNetworkEmbeddingError('edgelist must be set to a file')
+            if self._skip_logging is False:
+                logutils.setup_filelogger(outdir=self._outdir,
+                                          handlerprefix='cellmaps_network_embedding')
+                self._write_task_start_json()
 
-        if not os.path.isfile(self._edgelist):
-            raise CellMapsNetworkEmbeddingError('edgelist ' +
-                                                str(self._edgelist) +
-                                                ' is not a file')
+            if self._nx_network is None:
+                raise CellMapsNetworkEmbeddingError('network is None')
 
-        uniq_genes = set()
-        name_to_id = {}
-        id_to_name = {}
-        idcounter = 0
+            self._remove_header_edge_from_network()
 
-        numeric_edgelist = os.path.join(self._outdir, 'node2vec_input_edgelist.tsv')
+            n2v_obj = Node2Vec(self._nx_network, dimensions=self._dimensions,
+                               walk_length=self._walk_length,
+                               num_walks=self._num_walks,
+                               workers=self._workers, q=self._q, p=self._p)
 
-        with open(numeric_edgelist, 'w') as f:
-            with open(self._edgelist, 'r') as inputf:
-                reader = csv.DictReader(inputf, delimiter='\t')
-                for row in reader:
-                    for entry in [row['geneA'], row['geneB']]:
-                        if entry not in name_to_id:
-                            name_to_id[entry] = idcounter
-                            id_to_name[idcounter] = entry
-                            idcounter += 1
-                    f.write(str(name_to_id[row['geneA']]) + '\t' + str(name_to_id[row['geneB']]) + '\n')
-                    uniq_genes.add(row['geneA'])
-                    uniq_genes.add(row['geneB'])
-        node2vec_out = os.path.join(self._outdir, 'node2vec_out.tsv')
-        returncode, out, err = self._run_cmd([self._pythonbinary, self._node2vec, '--input',
-                                              numeric_edgelist,
-                                              '--output',
-                                              node2vec_out,
-                                              '--dimensions', str(self._dimensions),
-                                              '--p', str(self._p), '--q', str(self._q)])
-        sys.stdout.write(out)
-        sys.stderr.write(err)
-        sys.stdout.write('Exit Code: ' + str(returncode))
-
-        with open(os.path.join(self._outdir, 'apms_emd.tsv'), 'w') as f:
-            headerline = ['']
-            for x in range(1, self._dimensions+1):
-                headerline.append(str(x))
-            f.write('\t'.join(headerline) + '\n')
-            with open(node2vec_out, 'r') as inputf:
-                reader = csv.reader(inputf, delimiter=' ')
-                next(reader)
-                for row in reader:
-                    print(row)
-                    f.write(id_to_name[int(row[0])] + '\t')
-                    resultline = []
-                    for entry in row[1:self._dimensions+1]:
-                        resultline.append(str(entry))
-                    f.write('\t'.join(resultline) + '\n')
-
-        """
-        with open(os.path.join(self._outdir, 'apms_emd.tsv'), 'w') as f:
-            headerline = ['']
-            for x in range(1, 1025):
-                headerline.append(str(x))
-            f.write('\t'.join(headerline) + '\n')
-            for gene in uniq_genes:
-                embedding = [gene]
-                for cntr in range(self._dimensions):
-                    embedding.append(str(random.random()))
-                f.write('\t'.join(embedding) + '\n')
-        """
-        return 0
+            temp_out_file = os.path.join(self._outdir, 'node2vec.w2v')
+            # Embed nodes
+            model = n2v_obj.fit(window=10, min_count=0, sg=1, epochs=1)
+            model.wv.save_word2vec_format(temp_out_file)
+            exitcode = 0
+            return exitcode
+        finally:
+            self._end_time = int(time.time())
+            if self._skip_logging is False:
+                # write a task finish file
+                logutils.write_task_finish_json(outdir=self._outdir,
+                                                start_time=self._start_time,
+                                                end_time=self._end_time,
+                                                status=exitcode)

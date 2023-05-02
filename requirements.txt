@@ -1,1 +1,4 @@
-
+cellmaps_utils
+node2vec
+networkx
+fairscape-cli

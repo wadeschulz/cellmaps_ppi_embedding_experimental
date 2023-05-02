@@ -4,7 +4,8 @@ import argparse
 import sys
 import logging
 import logging.config
-
+import networkx as nx
+from cellmaps_utils import logutils
 import cellmaps_network_embedding
 from cellmaps_network_embedding.runner import CellMapsNetworkEmbeddingRunner
 
@@ -40,13 +41,23 @@ def _parse_arguments(desc, args):
                                      formatter_class=Formatter)
     parser.add_argument('outdir', help='Output directory')
     parser.add_argument('--input', required=True,
-                        help='Input edgelist file')
+                        help='Directory where apms_edgelist.tsv file resides')
     parser.add_argument('--dimensions', type=int, default=1024,
                         help='Size of embedding to generate')
+    parser.add_argument('--walk_length', type=int, default=80,
+                        help='Walk Length')
+    parser.add_argument('--num_walks', type=int, default=10,
+                        help='Num walks')
+    parser.add_argument('--workers', type=int, default=8,
+                        help='Number of workers')
     parser.add_argument('--p', type=int, default=2,
                         help='--p value to pass to node2vec')
     parser.add_argument('--q', type=int, default=1,
                         help='--q value to pass to node2vec')
+    parser.add_argument('--skip_logging', action='store_true',
+                        help='If set, output.log, error.log and '
+                             'task_#_start/finish.json '
+                             'files will not be created')
     parser.add_argument('--logconf', default=None,
                         help='Path to python logging configuration file in '
                              'this format: https://docs.python.org/3/library/'
@@ -65,29 +76,6 @@ def _parse_arguments(desc, args):
                                  cellmaps_network_embedding.__version__))
 
     return parser.parse_args(args)
-
-
-def _setup_logging(args):
-    """
-    Sets up logging based on parsed command line arguments.
-    If args.logconf is set use that configuration otherwise look
-    at args.verbose and set logging for this module
-
-    :param args: parsed command line arguments from argparse
-    :raises AttributeError: If args is None or args.logconf is None
-    :return: None
-    """
-
-    if args.logconf is None:
-        level = (50 - (10 * args.verbose))
-        logging.basicConfig(format=LOG_FORMAT,
-                            level=level)
-        logger.setLevel(level)
-        return
-
-    # logconf was set use that file
-    logging.config.fileConfig(args.logconf,
-                              disable_existing_loggers=False)
 
 
 def main(args):
@@ -112,12 +100,17 @@ def main(args):
     theargs.version = cellmaps_network_embedding.__version__
 
     try:
-        _setup_logging(theargs)
-        return CellMapsNetworkEmbeddingRunner(edgelist=theargs.input,
+        logutils.setup_cmd_logging(theargs)
+        return CellMapsNetworkEmbeddingRunner(nx_network=nx.read_edgelist(CellMapsNetworkEmbeddingRunner.get_apms_edgelist_file(theargs.input),
+                                                                          delimiter='\t'),
                                               outdir=theargs.outdir,
                                               dimensions=theargs.dimensions,
                                               p=theargs.p,
-                                              q=theargs.q).run()
+                                              q=theargs.q,
+                                              walk_length=theargs.walk_length,
+                                              num_walks=theargs.num_walks,
+                                              workers=theargs.workers,
+                                              skip_logging=theargs.skip_logging,).run()
     except Exception as e:
         logger.exception('Caught exception: ' + str(e))
         return 2
