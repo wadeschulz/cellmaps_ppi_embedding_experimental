@@ -175,7 +175,7 @@ class CellMapsNetworkEmbeddingRunner(object):
                                           handlerprefix='cellmaps_network_embedding')
                 self._write_task_start_json()
 
-            with open(os.path.join(self._outdir, 'apms_emd.tsv'), 'w', newline='') as f:
+            with open(os.path.join(self._outdir, 'ppi_emd.tsv'), 'w', newline='') as f:
                 writer = csv.writer(f, delimiter='\t')
                 header_line = ['']
                 header_line.extend([x for x in range(1, self._embedding_generator.get_dimensions())])
