@@ -27,20 +27,20 @@ class TestCellmapsNetworkEmbedding(unittest.TestCase):
                                                               '--input',
                                                               'somefile'])
 
-        self.assertEqual(res.verbose, 0)
-        self.assertEqual(res.outdir, 'outdir')
-        self.assertEqual(res.input, 'somefile')
-        self.assertEqual(res.p, 2)
-        self.assertEqual(res.q, 1)
-        self.assertEqual(res.dimensions, 1024)
-        self.assertEqual(res.logconf, None)
+        self.assertEqual(0, res.verbose, 0)
+        self.assertEqual('outdir', res.outdir)
+        self.assertEqual('somefile', res.inputdir)
+        self.assertEqual(2, res.p)
+        self.assertEqual(1, res.q)
+        self.assertEqual(1024, res.dimensions)
+        self.assertEqual(None, res.logconf)
 
         someargs = ['-vv', '--logconf', 'hi', 'outdir',
-                    '--input', 'somefile']
+                    '--inputdir', 'somefile']
         res = cellmaps_network_embeddingcmd._parse_arguments('hi', someargs)
 
-        self.assertEqual(res.verbose, 2)
-        self.assertEqual(res.logconf, 'hi')
+        self.assertEqual(2, res.verbose)
+        self.assertEqual('hi', res.logconf)
 
     def test_main(self):
         """Tests main function"""

@@ -9,6 +9,7 @@ import tempfile
 import shutil
 import csv
 from cellmaps_network_embedding.runner import CellMapsNetworkEmbeddingRunner
+from cellmaps_network_embedding.runner import Node2VecEmbeddingGenerator
 from cellmaps_network_embedding.exceptions import CellMapsNetworkEmbeddingError
 
 
@@ -37,9 +38,12 @@ class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
             self.assertEqual('outdir must be set', str(ce))
 
     def test_run_no_edgelist(self):
+        temp_dir = tempfile.mkdtemp()
         try:
-            temp_dir = tempfile.mkdtemp()
-            myobj = CellMapsNetworkEmbeddingRunner(outdir=temp_dir)
+            rundir = os.path.join(temp_dir, 'run')
+            gen = Node2VecEmbeddingGenerator(None)
+            myobj = CellMapsNetworkEmbeddingRunner(outdir=rundir,
+                                                   embedding_generator=gen)
             myobj.run()
             self.fail('Expected exception')
         except CellMapsNetworkEmbeddingError as ce:
