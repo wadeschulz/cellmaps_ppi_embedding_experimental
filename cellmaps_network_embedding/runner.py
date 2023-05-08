@@ -129,7 +129,7 @@ class CellMapsNetworkEmbeddingRunner(object):
 
     @staticmethod
     def get_apms_edgelist_file(input_dir=None,
-                               edgelist_filename='apms_edgelist.tsv'):
+                               edgelist_filename='ppi_edgelist.tsv'):
         """
 
         :param input_dir:
