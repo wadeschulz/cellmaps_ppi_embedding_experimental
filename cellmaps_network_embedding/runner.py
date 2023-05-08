@@ -15,44 +15,111 @@ from cellmaps_network_embedding.exceptions import CellMapsNetworkEmbeddingError
 logger = logging.getLogger(__name__)
 
 
+class EmbeddingGenerator(object):
+    """
+    Base class for implementations that generate
+    network embeddings
+    """
+    def __init__(self, dimensions=1024):
+        """
+        Constructor
+        """
+        self._dimensions = dimensions
+
+    def get_dimensions(self):
+        """
+        Gets number of dimensions this embedding will generate
+
+        :return: number of dimensions aka vector length
+        :rtype: int
+        """
+        return self._dimensions
+
+    def get_next_embedding(self):
+        """
+        Generator method for getting next embedding.
+        Caller should implement with ``yield`` operator
+
+        :raises: NotImplementedError: Subclasses should implement this
+        :return: Embedding
+        :rtype: list
+        """
+        raise NotImplementedError('Subclasses should implement')
+
+
+class Node2VecEmbeddingGenerator(EmbeddingGenerator):
+    """
+
+    """
+    def __init__(self, nx_network, p=2, q=1, dimensions=1024,
+                 walk_length=80, num_walks=80, workers=8):
+        """
+        Constructor
+        """
+        super().__init__(dimensions=dimensions)
+        self._nx_network = nx_network
+        self._p = p
+        self._q = q
+        self._walk_length = walk_length
+        self._num_walks = num_walks
+        self._workers = workers
+
+    def _remove_header_edge_from_network(self):
+        """
+        Removes edge named geneA geneB which is actually the
+        header of the edge list file
+
+        """
+        # remove geneA geneB edge cause it is the header of file
+        try:
+            self._nx_network.remove_edge('geneA', 'geneB')
+        except nx.NetworkXError as ne:
+            logger.debug('No edge named geneA -> geneB to remove' + str(ne))
+
+        self._nx_network.remove_nodes_from(['geneA', 'geneB'])
+
+    def get_next_embedding(self):
+        """
+
+        :return:
+        """
+        if self._nx_network is None:
+            raise CellMapsNetworkEmbeddingError('network is None')
+
+        self._remove_header_edge_from_network()
+
+        n2v_obj = Node2Vec(self._nx_network, dimensions=self._dimensions,
+                           walk_length=self._walk_length,
+                           num_walks=self._num_walks,
+                           workers=self._workers, q=self._q, p=self._p)
+
+        # Embed nodes
+        model = n2v_obj.fit(window=10, min_count=0, sg=1, epochs=1)
+        for key in model.wv.index_to_key:
+            row = [key]
+            row.extend(model.wv[key].tolist())
+            yield row
+
+
 class CellMapsNetworkEmbeddingRunner(object):
     """
     Class to run algorithm
     """
-    def __init__(self, nx_network=None,
-                 outdir=None,
-                 p=2,
-                 q=1,
-                 dimensions=1024,
-                 walk_length=80,
-                 num_walks=10,
-                 workers=8,
+    def __init__(self, outdir=None,
+                 embedding_generator=None,
                  skip_logging=False,
                  misc_info_dict=None):
         """
 
-        :param nx_network:
-        :param outdir:
-        :param p:
-        :param q:
-        :param dimensions:
-        :param walk_length:
-        :param num_walks:
-        :param workers:
         :param skip_logging:
         :param misc_info_dict:
         """
         self._start_time = int(time.time())
         self._end_time = -1
         self._misc_info_dict = misc_info_dict
-        self._nx_network = nx_network
         self._outdir = outdir
-        self._dimensions = dimensions
-        self._p = p
-        self._q = q
-        self._walk_length = walk_length
-        self._num_walks = num_walks
-        self._workers = workers
+        self._embedding_generator = embedding_generator
+
         if skip_logging is None:
             self._skip_logging = False
         else:
@@ -76,12 +143,7 @@ class CellMapsNetworkEmbeddingRunner(object):
         what is to be run
 
         """
-        data = {'p': str(self._p),
-                'q': str(self._q),
-                'walk_length': str(self._walk_length),
-                'num_walks': str(self._num_walks),
-                'dimensions': str(self._dimensions),
-                'workers': str(self._workers)}
+        data = {}
 
         if self._misc_info_dict is not None:
             data.update(self._misc_info_dict)
@@ -90,20 +152,6 @@ class CellMapsNetworkEmbeddingRunner(object):
                                        start_time=self._start_time,
                                        version=cellmaps_network_embedding.__version__,
                                        data=data)
-
-    def _remove_header_edge_from_network(self):
-        """
-        Removes edge named geneA geneB which is actually the
-        header of the edge list file
-
-        """
-        # remove geneA geneB edge cause it is the header of file
-        try:
-            self._nx_network.remove_edge('geneA', 'geneB')
-        except nx.NetworkXError as ne:
-            logger.debug('No edge named geneA -> geneB to remove' + str(ne))
-
-        self._nx_network.remove_nodes_from(['geneA', 'geneB'])
 
     def run(self):
         """
@@ -127,29 +175,12 @@ class CellMapsNetworkEmbeddingRunner(object):
                                           handlerprefix='cellmaps_network_embedding')
                 self._write_task_start_json()
 
-            if self._nx_network is None:
-                raise CellMapsNetworkEmbeddingError('network is None')
-
-            self._remove_header_edge_from_network()
-
-            n2v_obj = Node2Vec(self._nx_network, dimensions=self._dimensions,
-                               walk_length=self._walk_length,
-                               num_walks=self._num_walks,
-                               workers=self._workers, q=self._q, p=self._p)
-
-            temp_out_file = os.path.join(self._outdir, 'node2vec.w2v')
-            # Embed nodes
-            model = n2v_obj.fit(window=10, min_count=0, sg=1, epochs=1)
-            model.wv.save_word2vec_format(temp_out_file)
-            model.save(os.path.join(self._outdir, 'word2vec.model'))
             with open(os.path.join(self._outdir, 'apms_emd.tsv'), 'w', newline='') as f:
                 writer = csv.writer(f, delimiter='\t')
                 header_line = ['']
-                header_line.extend([x for x in range(1, self._dimensions)])
+                header_line.extend([x for x in range(1, self._embedding_generator.get_dimensions())])
                 writer.writerow(header_line)
-                for key in model.wv.index_to_key:
-                    row = [key]
-                    row.extend(model.wv[key].tolist())
+                for row in self._embedding_generator.get_next_embedding():
                     writer.writerow(row)
 
             exitcode = 0

@@ -7,6 +7,7 @@ import logging.config
 import networkx as nx
 from cellmaps_utils import logutils
 import cellmaps_network_embedding
+from cellmaps_network_embedding.runner import Node2VecEmbeddingGenerator
 from cellmaps_network_embedding.runner import CellMapsNetworkEmbeddingRunner
 
 logger = logging.getLogger(__name__)
@@ -40,7 +41,7 @@ def _parse_arguments(desc, args):
     parser = argparse.ArgumentParser(description=desc,
                                      formatter_class=Formatter)
     parser.add_argument('outdir', help='Output directory')
-    parser.add_argument('--input', required=True,
+    parser.add_argument('--inputdir', required=True,
                         help='Directory where apms_edgelist.tsv file resides')
     parser.add_argument('--dimensions', type=int, default=1024,
                         help='Size of embedding to generate')
@@ -101,15 +102,18 @@ def main(args):
 
     try:
         logutils.setup_cmd_logging(theargs)
-        return CellMapsNetworkEmbeddingRunner(nx_network=nx.read_edgelist(CellMapsNetworkEmbeddingRunner.get_apms_edgelist_file(theargs.input),
-                                                                          delimiter='\t'),
-                                              outdir=theargs.outdir,
-                                              dimensions=theargs.dimensions,
-                                              p=theargs.p,
-                                              q=theargs.q,
-                                              walk_length=theargs.walk_length,
-                                              num_walks=theargs.num_walks,
-                                              workers=theargs.workers,
+
+        gen = Node2VecEmbeddingGenerator(nx_network=nx.read_edgelist(CellMapsNetworkEmbeddingRunner.get_apms_edgelist_file(theargs.inputdir),
+                                                                     delimiter='\t'),
+                                         dimensions=theargs.dimensions,
+                                         p=theargs.p,
+                                         q=theargs.q,
+                                         walk_length=theargs.walk_length,
+                                         num_walks=theargs.num_walks,
+                                         workers=theargs.workers)
+
+        return CellMapsNetworkEmbeddingRunner(outdir=theargs.outdir,
+                                              embedding_generator=gen,
                                               skip_logging=theargs.skip_logging,).run()
     except Exception as e:
         logger.exception('Caught exception: ' + str(e))
