@@ -24,18 +24,21 @@ class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
 
     def test_constructor(self):
         """Tests constructor"""
-        myobj = CellMapsNetworkEmbeddingRunner()
-
-        self.assertIsNotNone(myobj)
-
-    def test_run_no_outdir(self):
-        """ Tests run()"""
-        myobj = CellMapsNetworkEmbeddingRunner()
+        temp_dir = tempfile.mkdtemp()
         try:
-            myobj.run()
+            myobj = CellMapsNetworkEmbeddingRunner(outdir=os.path.join(temp_dir,
+                                                                       'out'))
+            self.assertIsNotNone(myobj)
+        finally:
+            shutil.rmtree(temp_dir)
+
+    def test_constructor_no_outdir(self):
+        """ Tests run()"""
+        try:
+            myobj = CellMapsNetworkEmbeddingRunner()
             self.fail('Expected exception')
         except CellMapsNetworkEmbeddingError as ce:
-            self.assertEqual('outdir must be set', str(ce))
+            self.assertEqual('outdir is None', str(ce))
 
     def test_run_no_edgelist(self):
         temp_dir = tempfile.mkdtemp()

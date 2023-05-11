@@ -114,7 +114,8 @@ def main(args):
 
         return CellMapsNetworkEmbeddingRunner(outdir=theargs.outdir,
                                               embedding_generator=gen,
-                                              skip_logging=theargs.skip_logging,).run()
+                                              skip_logging=theargs.skip_logging,
+                                              input_data_dict=theargs.__dict__).run()
     except Exception as e:
         logger.exception('Caught exception: ' + str(e))
         return 2

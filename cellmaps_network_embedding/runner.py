@@ -7,8 +7,11 @@ import logging
 import csv
 import networkx as nx
 from node2vec import Node2Vec
-import cellmaps_network_embedding
+from cellmaps_utils import constants
 from cellmaps_utils import logutils
+from cellmaps_utils.provenance import ProvenanceUtil
+
+import cellmaps_network_embedding
 from cellmaps_network_embedding.exceptions import CellMapsNetworkEmbeddingError
 
 
@@ -108,18 +111,29 @@ class CellMapsNetworkEmbeddingRunner(object):
     def __init__(self, outdir=None,
                  embedding_generator=None,
                  skip_logging=False,
-                 misc_info_dict=None):
+                 name=cellmaps_network_embedding.__name__,
+                 organization_name=None,
+                 project_name=None,
+                 provenance_utils=ProvenanceUtil(),
+                 input_data_dict=None):
         """
 
         :param skip_logging:
         :param misc_info_dict:
         """
+        if outdir is None:
+            raise CellMapsNetworkEmbeddingError('outdir is None')
+
+        self._outdir = os.path.abspath(outdir)
         self._start_time = int(time.time())
         self._end_time = -1
-        self._misc_info_dict = misc_info_dict
-        self._outdir = outdir
+        self._input_data_dict = input_data_dict
         self._embedding_generator = embedding_generator
-
+        self._name = name
+        self._project_name = project_name
+        self._organization_name = organization_name
+        self._input_data_dict = input_data_dict
+        self._provenance_utils = provenance_utils
         if skip_logging is None:
             self._skip_logging = False
         else:
@@ -129,7 +143,7 @@ class CellMapsNetworkEmbeddingRunner(object):
 
     @staticmethod
     def get_apms_edgelist_file(input_dir=None,
-                               edgelist_filename='ppi_edgelist.tsv'):
+                               edgelist_filename=constants.PPI_EDGELIST_FILE):
         """
 
         :param input_dir:
@@ -143,15 +157,66 @@ class CellMapsNetworkEmbeddingRunner(object):
         what is to be run
 
         """
-        data = {}
-
-        if self._misc_info_dict is not None:
-            data.update(self._misc_info_dict)
-
         logutils.write_task_start_json(outdir=self._outdir,
                                        start_time=self._start_time,
                                        version=cellmaps_network_embedding.__version__,
-                                       data=data)
+                                       data={'commandlineargs': self._input_data_dict})
+
+    def _create_run_crate(self):
+        """
+        Creates rocrate for output directory
+
+        :raises CellMapsProvenanceError: If there is an error
+        """
+        name = self._name
+        if name is None:
+            name = 'TODO better set this via input rocrate'
+
+        # TODO: If organization or project name is unset need to pull from input rocrate
+        org_name = self._organization_name
+        if org_name is None:
+            org_name = 'TODO BETTER SET THIS via input rocrate'
+
+        proj_name = self._project_name
+        if proj_name is None:
+            proj_name = 'TODO BETTER SET THIS via input rocrate'
+        try:
+            self._provenance_utils.register_rocrate(self._outdir,
+                                                    name=name,
+                                                    organization_name=org_name,
+                                                    project_name=proj_name)
+        except TypeError as te:
+            raise CellMapsNetworkEmbeddingError('Invalid provenance: ' + str(te))
+        except KeyError as ke:
+            raise CellMapsNetworkEmbeddingError('Key missing in provenance: ' + str(ke))
+
+    def _register_software(self):
+        """
+        Registers this tool
+
+        :raises CellMapsImageEmbeddingError: If fairscape call fails
+        """
+        self._softwareid = self._provenance_utils.register_software(self._outdir,
+                                                                    name=self._name,
+                                                                    description=cellmaps_network_embedding.__description__,
+                                                                    author=cellmaps_network_embedding.__author__,
+                                                                    version=cellmaps_network_embedding.__version__,
+                                                                    file_format='.py',
+                                                                    url=cellmaps_network_embedding.__repo_url__)
+
+    def _register_computation(self):
+        """
+        # Todo: added inused dataset, software and what is being generated
+        :return:
+        """
+        self._provenance_utils.register_computation(self._outdir,
+                                                    name=cellmaps_network_embedding.__name__ + ' computation',
+                                                    run_by=str(os.getlogin()),
+                                                    command=str(self._input_data_dict),
+                                                    description='run of ' + cellmaps_network_embedding.__name__,
+                                                    used_software=[self._softwareid])
+                                                    #used_dataset=[self._unique_datasetid, self._samples_datasetid],
+                                                    #generated=[self._image_gene_attrid])
 
     def run(self):
         """
@@ -161,12 +226,8 @@ class CellMapsNetworkEmbeddingRunner(object):
         :return:
         """
         logger.debug('In run method')
+        exitcode = 99
         try:
-            exitcode = 99
-
-            if self._outdir is None:
-                raise CellMapsNetworkEmbeddingError('outdir must be set')
-
             if not os.path.isdir(self._outdir):
                 os.makedirs(self._outdir, mode=0o755)
 
@@ -175,7 +236,14 @@ class CellMapsNetworkEmbeddingRunner(object):
                                           handlerprefix='cellmaps_network_embedding')
                 self._write_task_start_json()
 
-            with open(os.path.join(self._outdir, 'ppi_emd.tsv'), 'w', newline='') as f:
+            self._create_run_crate()
+
+            # Todo: uncomment when fixed
+            # register software fails due to this bug:
+            # https://github.com/fairscape/fairscape-cli/issues/7
+            # self._register_software()
+
+            with open(os.path.join(self._outdir, constants.PPI_EMBEDDING_FILE), 'w', newline='') as f:
                 writer = csv.writer(f, delimiter='\t')
                 header_line = ['']
                 header_line.extend([x for x in range(1, self._embedding_generator.get_dimensions())])
@@ -183,8 +251,13 @@ class CellMapsNetworkEmbeddingRunner(object):
                 for row in self._embedding_generator.get_next_embedding():
                     writer.writerow(row)
 
+            # Todo: uncomment when above work
+            # Above registrations need to work for this to work
+            # register computation
+            # self._register_computation()
+
             exitcode = 0
-            return exitcode
+
         finally:
             self._end_time = int(time.time())
             if self._skip_logging is False:
@@ -193,3 +266,4 @@ class CellMapsNetworkEmbeddingRunner(object):
                                                 start_time=self._start_time,
                                                 end_time=self._end_time,
                                                 status=exitcode)
+        return exitcode

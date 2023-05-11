@@ -20,16 +20,15 @@ with open('HISTORY.rst') as history_file:
 
 requirements = ['cellmaps_utils',
                 'node2vec',
-                'networkx',
-                'fairscape-cli']
+                'networkx']
 
 setup_requirements = [ ]
 
 test_requirements = [ ]
 
 setup(
-    author="Christopher Churas",
-    author_email='cchuras@ucsd.edu',
+    author="Mayank Jain",
+    author_email='maj014@ucsd.edu',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
@@ -44,13 +43,13 @@ setup(
     install_requires=requirements,
     license="MIT license",
     long_description=readme + '\n\n' + history,
-    long_description_content_type = 'text/x-rst',
+    long_description_content_type='text/x-rst',
     include_package_data=True,
     keywords='cellmaps_network_embedding',
     name='cellmaps_network_embedding',
     packages=find_packages(include=['cellmaps_network_embedding']),
     package_dir={'cellmaps_network_embedding': 'cellmaps_network_embedding'},
-    scripts=[ 'cellmaps_network_embedding/cellmaps_network_embeddingcmd.py'],
+    scripts=['cellmaps_network_embedding/cellmaps_network_embeddingcmd.py'],
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
