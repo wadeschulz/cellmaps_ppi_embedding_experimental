@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Tests for `cellmaps_network_embedding` package."""
+"""Tests for `cellmaps_ppi_embedding` package."""
 
 import os
 import tempfile
 import shutil
 
 import unittest
-from cellmaps_network_embedding import cellmaps_network_embeddingcmd
+from cellmaps_ppi_embedding import cellmaps_ppi_embeddingcmd
 
 
 class TestCellmapsNetworkEmbedding(unittest.TestCase):
-    """Tests for `cellmaps_network_embedding` package."""
+    """Tests for `cellmaps_ppi_embedding` package."""
 
     def setUp(self):
         """Set up test fixtures, if any."""
@@ -22,8 +22,8 @@ class TestCellmapsNetworkEmbedding(unittest.TestCase):
 
     def test_parse_arguments(self):
         """Tests parse arguments"""
-        res = cellmaps_network_embeddingcmd._parse_arguments('hi',
-                                                             ['outdir',
+        res = cellmaps_ppi_embeddingcmd._parse_arguments('hi',
+                                                         ['outdir',
                                                               '--input',
                                                               'somefile'])
 
@@ -37,7 +37,7 @@ class TestCellmapsNetworkEmbedding(unittest.TestCase):
 
         someargs = ['-vv', '--logconf', 'hi', 'outdir',
                     '--inputdir', 'somefile']
-        res = cellmaps_network_embeddingcmd._parse_arguments('hi', someargs)
+        res = cellmaps_ppi_embeddingcmd._parse_arguments('hi', someargs)
 
         self.assertEqual(2, res.verbose)
         self.assertEqual('hi', res.logconf)
@@ -48,7 +48,7 @@ class TestCellmapsNetworkEmbedding(unittest.TestCase):
         # try where loading config is successful
         try:
             temp_dir = tempfile.mkdtemp()
-            res = cellmaps_network_embeddingcmd.main(['myprog.py',
+            res = cellmaps_ppi_embeddingcmd.main(['myprog.py',
                                                       'outdir',
                                                       '--input',
                                                       'somefile'])

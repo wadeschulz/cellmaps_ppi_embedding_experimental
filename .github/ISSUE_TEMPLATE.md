@@ -1,4 +1,4 @@
-* CM4AI Network Embedding Tool version:
+* CM4AI PPI Embedding Tool version:
 * Python version:
 * Operating System:
 

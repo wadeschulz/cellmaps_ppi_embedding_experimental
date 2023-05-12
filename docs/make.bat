@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=.
 set BUILDDIR=_build
-set SPHINXPROJ=cellmaps_network_embedding
+set SPHINXPROJ=cellmaps_ppi_embedding
 
 if "%1" == "" goto help
 

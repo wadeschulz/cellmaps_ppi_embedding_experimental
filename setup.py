@@ -7,7 +7,7 @@ import re
 from setuptools import setup, find_packages
 
 
-with open(os.path.join('cellmaps_network_embedding', '__init__.py')) as ver_file:
+with open(os.path.join('cellmaps_ppi_embedding', '__init__.py')) as ver_file:
     for line in ver_file:
         if line.startswith('__version__'):
             version=re.sub("'", "", line[line.index("'"):])
@@ -45,14 +45,14 @@ setup(
     long_description=readme + '\n\n' + history,
     long_description_content_type='text/x-rst',
     include_package_data=True,
-    keywords='cellmaps_network_embedding',
-    name='cellmaps_network_embedding',
-    packages=find_packages(include=['cellmaps_network_embedding']),
-    package_dir={'cellmaps_network_embedding': 'cellmaps_network_embedding'},
-    scripts=['cellmaps_network_embedding/cellmaps_network_embeddingcmd.py'],
+    keywords='cellmaps_ppi_embedding',
+    name='cellmaps_ppi_embedding',
+    packages=find_packages(include=['cellmaps_ppi_embedding']),
+    package_dir={'cellmaps_ppi_embedding': 'cellmaps_ppi_embedding'},
+    scripts=['cellmaps_ppi_embedding/cellmaps_ppi_embeddingcmd.py'],
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/idekerlab/cellmaps_network_embedding',
+    url='https://github.com/idekerlab/cellmaps_ppi_embedding',
     version=version,
     zip_safe=False)

@@ -11,8 +11,8 @@ from cellmaps_utils import constants
 from cellmaps_utils import logutils
 from cellmaps_utils.provenance import ProvenanceUtil
 
-import cellmaps_network_embedding
-from cellmaps_network_embedding.exceptions import CellMapsNetworkEmbeddingError
+import cellmaps_ppi_embedding
+from cellmaps_ppi_embedding.exceptions import CellMapsPPIEmbeddingError
 
 
 logger = logging.getLogger(__name__)
@@ -87,7 +87,7 @@ class Node2VecEmbeddingGenerator(EmbeddingGenerator):
         :return:
         """
         if self._nx_network is None:
-            raise CellMapsNetworkEmbeddingError('network is None')
+            raise CellMapsPPIEmbeddingError('network is None')
 
         self._remove_header_edge_from_network()
 
@@ -104,14 +104,14 @@ class Node2VecEmbeddingGenerator(EmbeddingGenerator):
             yield row
 
 
-class CellMapsNetworkEmbeddingRunner(object):
+class CellMapsPPIEmbedder(object):
     """
     Class to run algorithm
     """
     def __init__(self, outdir=None,
                  embedding_generator=None,
                  skip_logging=False,
-                 name=cellmaps_network_embedding.__name__,
+                 name=cellmaps_ppi_embedding.__name__,
                  organization_name=None,
                  project_name=None,
                  provenance_utils=ProvenanceUtil(),
@@ -122,7 +122,7 @@ class CellMapsNetworkEmbeddingRunner(object):
         :param misc_info_dict:
         """
         if outdir is None:
-            raise CellMapsNetworkEmbeddingError('outdir is None')
+            raise CellMapsPPIEmbeddingError('outdir is None')
 
         self._outdir = os.path.abspath(outdir)
         self._start_time = int(time.time())
@@ -159,7 +159,7 @@ class CellMapsNetworkEmbeddingRunner(object):
         """
         logutils.write_task_start_json(outdir=self._outdir,
                                        start_time=self._start_time,
-                                       version=cellmaps_network_embedding.__version__,
+                                       version=cellmaps_ppi_embedding.__version__,
                                        data={'commandlineargs': self._input_data_dict})
 
     def _create_run_crate(self):
@@ -186,9 +186,9 @@ class CellMapsNetworkEmbeddingRunner(object):
                                                     organization_name=org_name,
                                                     project_name=proj_name)
         except TypeError as te:
-            raise CellMapsNetworkEmbeddingError('Invalid provenance: ' + str(te))
+            raise CellMapsPPIEmbeddingError('Invalid provenance: ' + str(te))
         except KeyError as ke:
-            raise CellMapsNetworkEmbeddingError('Key missing in provenance: ' + str(ke))
+            raise CellMapsPPIEmbeddingError('Key missing in provenance: ' + str(ke))
 
     def _register_software(self):
         """
@@ -198,11 +198,11 @@ class CellMapsNetworkEmbeddingRunner(object):
         """
         self._softwareid = self._provenance_utils.register_software(self._outdir,
                                                                     name=self._name,
-                                                                    description=cellmaps_network_embedding.__description__,
-                                                                    author=cellmaps_network_embedding.__author__,
-                                                                    version=cellmaps_network_embedding.__version__,
+                                                                    description=cellmaps_ppi_embedding.__description__,
+                                                                    author=cellmaps_ppi_embedding.__author__,
+                                                                    version=cellmaps_ppi_embedding.__version__,
                                                                     file_format='.py',
-                                                                    url=cellmaps_network_embedding.__repo_url__)
+                                                                    url=cellmaps_ppi_embedding.__repo_url__)
 
     def _register_computation(self):
         """
@@ -210,10 +210,10 @@ class CellMapsNetworkEmbeddingRunner(object):
         :return:
         """
         self._provenance_utils.register_computation(self._outdir,
-                                                    name=cellmaps_network_embedding.__name__ + ' computation',
+                                                    name=cellmaps_ppi_embedding.__name__ + ' computation',
                                                     run_by=str(os.getlogin()),
                                                     command=str(self._input_data_dict),
-                                                    description='run of ' + cellmaps_network_embedding.__name__,
+                                                    description='run of ' + cellmaps_ppi_embedding.__name__,
                                                     used_software=[self._softwareid])
                                                     #used_dataset=[self._unique_datasetid, self._samples_datasetid],
                                                     #generated=[self._image_gene_attrid])
@@ -233,7 +233,7 @@ class CellMapsNetworkEmbeddingRunner(object):
 
             if self._skip_logging is False:
                 logutils.setup_filelogger(outdir=self._outdir,
-                                          handlerprefix='cellmaps_network_embedding')
+                                          handlerprefix='cellmaps_ppi_embedding')
                 self._write_task_start_json()
 
             self._create_run_crate()

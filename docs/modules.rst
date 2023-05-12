@@ -4,4 +4,4 @@ Reference
 .. toctree::
    :maxdepth: 4
 
-   cellmaps_network_embedding
+   cellmaps_ppi_embedding

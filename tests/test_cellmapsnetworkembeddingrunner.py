@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Tests for `cellmaps_network_embedding` package."""
+"""Tests for `cellmaps_ppi_embedding` package."""
 
 import os
 import unittest
 import tempfile
 import shutil
 import csv
-from cellmaps_network_embedding.runner import CellMapsNetworkEmbeddingRunner
-from cellmaps_network_embedding.runner import Node2VecEmbeddingGenerator
-from cellmaps_network_embedding.exceptions import CellMapsNetworkEmbeddingError
+from cellmaps_ppi_embedding.runner import CellMapsPPIEmbedder
+from cellmaps_ppi_embedding.runner import Node2VecEmbeddingGenerator
+from cellmaps_ppi_embedding.exceptions import CellMapsPPIEmbeddingError
 
 
 class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
-    """Tests for `cellmaps_network_embedding` package."""
+    """Tests for `cellmaps_ppi_embedding` package."""
 
     def setUp(self):
         """Set up test fixtures, if any."""
@@ -26,7 +26,7 @@ class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
         """Tests constructor"""
         temp_dir = tempfile.mkdtemp()
         try:
-            myobj = CellMapsNetworkEmbeddingRunner(outdir=os.path.join(temp_dir,
+            myobj = CellMapsPPIEmbedder(outdir=os.path.join(temp_dir,
                                                                        'out'))
             self.assertIsNotNone(myobj)
         finally:
@@ -35,9 +35,9 @@ class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
     def test_constructor_no_outdir(self):
         """ Tests run()"""
         try:
-            myobj = CellMapsNetworkEmbeddingRunner()
+            myobj = CellMapsPPIEmbedder()
             self.fail('Expected exception')
-        except CellMapsNetworkEmbeddingError as ce:
+        except CellMapsPPIEmbeddingError as ce:
             self.assertEqual('outdir is None', str(ce))
 
     def test_run_no_edgelist(self):
@@ -45,11 +45,11 @@ class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
         try:
             rundir = os.path.join(temp_dir, 'run')
             gen = Node2VecEmbeddingGenerator(None)
-            myobj = CellMapsNetworkEmbeddingRunner(outdir=rundir,
-                                                   embedding_generator=gen)
+            myobj = CellMapsPPIEmbedder(outdir=rundir,
+                                        embedding_generator=gen)
             myobj.run()
             self.fail('Expected exception')
-        except CellMapsNetworkEmbeddingError as ce:
+        except CellMapsPPIEmbeddingError as ce:
             self.assertEqual('network is None', str(ce))
         finally:
             shutil.rmtree(temp_dir)
@@ -62,8 +62,8 @@ class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
             with open(e_file, 'w') as f:
                 f.write('geneA\tgeneB\n')
                 f.write('ABC\tDEF\n')
-            myobj = CellMapsNetworkEmbeddingRunner(outdir=temp_dir,
-                                                   edgelist=e_file)
+            myobj = CellMapsPPIEmbedder(outdir=temp_dir,
+                                        edgelist=e_file)
             self.assertEqual(0, myobj.run())
             apms_emd = os.path.join(temp_dir, 'apms_emd.tsv')
             self.assertTrue(os.path.isfile(apms_emd))

@@ -51,7 +51,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 cellmaps_network_embedding tests
+	flake8 cellmaps_ppi_embedding tests
 
 test: ## run tests quickly with the default Python
 	python setup.py test
@@ -60,13 +60,13 @@ test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source cellmaps_network_embedding setup.py test
+	coverage run --source cellmaps_ppi_embedding setup.py test
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
-	sphinx-apidoc -o docs/ cellmaps_network_embedding
+	sphinx-apidoc -o docs/ cellmaps_ppi_embedding
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
@@ -91,9 +91,9 @@ install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
 dockerbuild: ## build docker image and store in local repository
-	@cv=`grep '__version__' cellmaps_network_embedding/__init__.py | sed "s/^.*= *'//" | sed "s/'.*//"`; \
-	docker build -t idekerlab/cellmaps_network_embedding:$$cv -f docker/Dockerfile .
+	@cv=`grep '__version__' cellmaps_ppi_embedding/__init__.py | sed "s/^.*= *'//" | sed "s/'.*//"`; \
+	docker build -t idekerlab/cellmaps_ppi_embedding:$$cv -f docker/Dockerfile .
 
 dockerpush: ## push image to dockerhub
-	@cv=`grep '__version__' cellmaps_network_embedding/__init__.py | sed "s/^.*= *'//" | sed "s/'.*//"`; \
-	docker push idekerlab/cellmaps_network_embedding:$$cv
+	@cv=`grep '__version__' cellmaps_ppi_embedding/__init__.py | sed "s/^.*= *'//" | sed "s/'.*//"`; \
+	docker push idekerlab/cellmaps_ppi_embedding:$$cv

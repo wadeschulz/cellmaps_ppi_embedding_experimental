@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install cellmaps_network_embedding, run this command in your terminal:
+To install cellmaps_ppi_embedding, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install cellmaps_network_embedding
+    $ pip install cellmaps_ppi_embedding
 
-This is the preferred method to install cellmaps_network_embedding, as it will always install the most recent stable release.
+This is the preferred method to install cellmaps_ppi_embedding, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,19 +26,19 @@ you through the process.
 From sources
 ------------
 
-The sources for cellmaps_network_embedding can be downloaded from the `Github repo`_.
+The sources for cellmaps_ppi_embedding can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/idekerlab/cellmaps_network_embedding
+    $ git clone git://github.com/idekerlab/cellmaps_ppi_embedding
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/idekerlab/cellmaps_network_embedding/tarball/master
+    $ curl  -OL https://github.com/idekerlab/cellmaps_ppi_embedding/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/idekerlab/cellmaps_network_embedding
-.. _tarball: https://github.com/idekerlab/cellmaps_network_embedding/tarball/master
+.. _Github repo: https://github.com/idekerlab/cellmaps_ppi_embedding
+.. _tarball: https://github.com/idekerlab/cellmaps_ppi_embedding/tarball/master

@@ -6,9 +6,9 @@ import logging
 import logging.config
 import networkx as nx
 from cellmaps_utils import logutils
-import cellmaps_network_embedding
-from cellmaps_network_embedding.runner import Node2VecEmbeddingGenerator
-from cellmaps_network_embedding.runner import CellMapsNetworkEmbeddingRunner
+import cellmaps_ppi_embedding
+from cellmaps_ppi_embedding.runner import Node2VecEmbeddingGenerator
+from cellmaps_ppi_embedding.runner import CellMapsPPIEmbedder
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +74,7 @@ def _parse_arguments(desc, args):
                              'logging)')
     parser.add_argument('--version', action='version',
                         version=('%(prog)s ' +
-                                 cellmaps_network_embedding.__version__))
+                                 cellmaps_ppi_embedding.__version__))
 
     return parser.parse_args(args)
 
@@ -86,24 +86,24 @@ def main(args):
     :param args: arguments passed to command line usually :py:func:`sys.argv[1:]`
     :type args: list
 
-    :return: return value of :py:meth:`cellmaps_network_embedding.runner.CellMapsNetworkEmbeddingRunner.run`
+    :return: return value of :py:meth:`cellmaps_ppi_embedding.runner.CellMapsPPIEmbedder.run`
              or ``2`` if an exception is raised
     :rtype: int
     """
     desc = """
     Version {version}
 
-    Invokes run() method on CellMapsNetworkEmbeddingRunner
+    Invokes run() method on CellMapsPPIEmbedder
 
-    """.format(version=cellmaps_network_embedding.__version__)
+    """.format(version=cellmaps_ppi_embedding.__version__)
     theargs = _parse_arguments(desc, args[1:])
     theargs.program = args[0]
-    theargs.version = cellmaps_network_embedding.__version__
+    theargs.version = cellmaps_ppi_embedding.__version__
 
     try:
         logutils.setup_cmd_logging(theargs)
 
-        gen = Node2VecEmbeddingGenerator(nx_network=nx.read_edgelist(CellMapsNetworkEmbeddingRunner.get_apms_edgelist_file(theargs.inputdir),
+        gen = Node2VecEmbeddingGenerator(nx_network=nx.read_edgelist(CellMapsPPIEmbedder.get_apms_edgelist_file(theargs.inputdir),
                                                                      delimiter='\t'),
                                          dimensions=theargs.dimensions,
                                          p=theargs.p,
@@ -112,10 +112,10 @@ def main(args):
                                          num_walks=theargs.num_walks,
                                          workers=theargs.workers)
 
-        return CellMapsNetworkEmbeddingRunner(outdir=theargs.outdir,
-                                              embedding_generator=gen,
-                                              skip_logging=theargs.skip_logging,
-                                              input_data_dict=theargs.__dict__).run()
+        return CellMapsPPIEmbedder(outdir=theargs.outdir,
+                                   embedding_generator=gen,
+                                   skip_logging=theargs.skip_logging,
+                                   input_data_dict=theargs.__dict__).run()
     except Exception as e:
         logger.exception('Caught exception: ' + str(e))
         return 2

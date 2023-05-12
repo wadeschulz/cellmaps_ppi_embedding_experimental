@@ -2,7 +2,7 @@ Developer Topics
 ====================
 
 This page contains topics related to development and
-deployment of **cellmaps_network_embedding**
+deployment of **cellmaps_ppi_embedding**
 
 
 

@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx
-SPHINXPROJ    = cellmaps_network_embedding
+SPHINXPROJ    = cellmaps_ppi_embedding
 SOURCEDIR     = .
 BUILDDIR      = _build
 

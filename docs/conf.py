@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# cellmaps_network_embedding documentation build configuration file, created by
+# cellmaps_ppi_embedding documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun  9 13:47:02 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -24,7 +24,7 @@ import re
 
 sys.path.insert(0, os.path.abspath('..'))
 
-import cellmaps_network_embedding
+import cellmaps_ppi_embedding
 
 # -- General configuration ---------------------------------------------
 
@@ -63,7 +63,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'cellmaps_network_embedding'
+project = u'cellmaps_ppi_embedding'
 copyright = u"2023, The Regents of the University of California"
 author = u"Christopher Churas"
 
@@ -76,7 +76,7 @@ version = None
 # The full version, including alpha/beta/rc tags.
 release = None
 
-init_file = os.path.join('..', 'cellmaps_network_embedding', '__init__.py')
+init_file = os.path.join('..', 'cellmaps_ppi_embedding', '__init__.py')
 with open(init_file) as ver_file:
     for line in ver_file:
         if line.startswith('__version__'):
@@ -131,7 +131,7 @@ html_theme = 'sphinx_rtd_theme'
 # -- Options for HTMLHelp output ---------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'cellmaps_network_embeddingdoc'
+htmlhelp_basename = 'cellmaps_ppi_embeddingdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------
@@ -158,8 +158,8 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'cellmaps_network_embedding.tex',
-     u'cellmaps_network_embedding Documentation',
+    (master_doc, 'cellmaps_ppi_embedding.tex',
+     u'cellmaps_ppi_embedding Documentation',
      u'Christopher Churas', 'manual'),
 ]
 
@@ -169,8 +169,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'cellmaps_network_embedding',
-     u'cellmaps_network_embedding Documentation',
+    (master_doc, 'cellmaps_ppi_embedding',
+     u'cellmaps_ppi_embedding Documentation',
      [author], 1)
 ]
 
@@ -181,10 +181,10 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'cellmaps_network_embedding',
-     u'cellmaps_network_embedding Documentation',
+    (master_doc, 'cellmaps_ppi_embedding',
+     u'cellmaps_ppi_embedding Documentation',
      author,
-     'cellmaps_network_embedding',
+     'cellmaps_ppi_embedding',
      'One line description of project.',
      'Miscellaneous'),
 ]

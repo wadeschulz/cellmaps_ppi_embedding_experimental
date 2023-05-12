@@ -1,15 +1,15 @@
-Welcome to cellmaps_network_embedding's documentation!
+Welcome to cellmaps_ppi_embedding's documentation!
 ================================================================
 
 
-.. image:: https://img.shields.io/pypi/v/cellmaps_network_embedding.svg
-        :target: https://pypi.python.org/pypi/cellmaps_network_embedding
+.. image:: https://img.shields.io/pypi/v/cellmaps_ppi_embedding.svg
+        :target: https://pypi.python.org/pypi/cellmaps_ppi_embedding
 
-.. image:: https://img.shields.io/travis/idekerlab/cellmaps_network_embedding.svg
-        :target: https://travis-ci.com/idekerlab/cellmaps_network_embedding
+.. image:: https://img.shields.io/travis/idekerlab/cellmaps_ppi_embedding.svg
+        :target: https://travis-ci.com/idekerlab/cellmaps_ppi_embedding
 
-.. image:: https://readthedocs.org/projects/cellmaps-network-embedding/badge/?version=latest
-        :target: https://cellmaps-network-embedding.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/cellmaps-ppi-embedding/badge/?version=latest
+        :target: https://cellmaps-ppi-embedding.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
 
