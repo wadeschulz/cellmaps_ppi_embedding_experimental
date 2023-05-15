@@ -39,7 +39,7 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
     ],
-    description="Python Boilerplate contains all the boilerplate you need to create a Python package with command line",
+    description="A tool to generate embeddings from networks for CM4AI pipeline",
     install_requires=requirements,
     license="MIT license",
     long_description=readme + '\n\n' + history,
