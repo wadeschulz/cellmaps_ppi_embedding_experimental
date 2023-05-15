@@ -16,8 +16,7 @@ cellmaps_ppi_embedding
 
 
 
-Python Boilerplate contains all the boilerplate you need to create a Python package with command line
-
+A tool to generate embeddings from networks for CM4AI pipeline
 
 * Free software: MIT license
 * Documentation: https://cellmaps-ppi-embedding.readthedocs.io.
@@ -27,12 +26,14 @@ Python Boilerplate contains all the boilerplate you need to create a Python pack
 Dependencies
 ------------
 
-* TODO add
+* `cellmaps_utils <https://pypi.org/project/cellmaps-utils>`__
+* `node2vec <https://pypi.org/project/node2vec>`__
+* `networkx <https://pypi.org/project/networkx>`__
 
 Compatibility
 -------------
 
-* Python 3.3+
+* Python 3.8+
 
 Installation
 ------------
