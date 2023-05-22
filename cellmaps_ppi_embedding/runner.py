@@ -218,7 +218,7 @@ class CellMapsPPIEmbedder(object):
         logger.debug('Registering computation with FAIRSCAPE')
         self._provenance_utils.register_computation(self._outdir,
                                                     name=cellmaps_ppi_embedding.__name__,
-                                                    run_by=str(os.getlogin()),
+                                                    run_by=str(self._provenance_utils.get_login()),
                                                     command=str(self._input_data_dict),
                                                     description='run of ' + cellmaps_ppi_embedding.__name__,
                                                     used_software=[self._softwareid],
