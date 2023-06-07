@@ -43,7 +43,7 @@ Installation
    git clone https://github.com/idekerlab/cellmaps_ppi_embedding
    cd cellmaps_ppi_embedding
    make dist
-   pip install dist/cellmaps_ppi_embeddingcmd*whl
+   pip install dist/cellmaps_ppi_embedding*whl
 
 
 Run **make** command with no arguments to see other build/deploy options including creation of Docker image 
