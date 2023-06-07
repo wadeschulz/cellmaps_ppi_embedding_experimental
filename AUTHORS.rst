@@ -11,6 +11,8 @@ Developers
 
 * Gege Qian <geqian@ucsd.edu>
 
+* Mayank Jain <maj014@ucsd.edu>
+
 * Christopher Churas <cchuras@ucsd.edu>
 
 Contributors
