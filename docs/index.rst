@@ -1,5 +1,6 @@
-Welcome to cellmaps_ppi_embedding's documentation!
-================================================================
+==========================
+Cell Maps PPI Embedder
+==========================
 
 
 .. image:: https://img.shields.io/pypi/v/cellmaps_ppi_embedding.svg
@@ -8,15 +9,8 @@ Welcome to cellmaps_ppi_embedding's documentation!
 .. image:: https://img.shields.io/travis/idekerlab/cellmaps_ppi_embedding.svg
         :target: https://travis-ci.com/idekerlab/cellmaps_ppi_embedding
 
-.. image:: https://readthedocs.org/projects/cellmaps-ppi-embedding/badge/?version=latest
-        :target: https://cellmaps-ppi-embedding.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
-
-
-
-Python Boilerplate contains all the boilerplate you need to create a Python package with command line
-
+Generate embeddings from Protein-Protein interaction networks used by
+`Cell Maps for AI (CM4AI) <https://cm4ai.org>`__
 
 * Free software: MIT license
 

@@ -1,5 +1,5 @@
 ==========================
-cellmaps_ppi_embedding
+Cell Maps PPI Embedder
 ==========================
 
 
@@ -16,7 +16,9 @@ cellmaps_ppi_embedding
 
 
 
-A tool to generate embeddings from networks for CM4AI pipeline
+Generate embeddings from Protein-Protein interaction networks used by
+`Cell Maps for AI (CM4AI) <https://cm4ai.org>`__
+
 
 * Free software: MIT license
 * Documentation: https://cellmaps-ppi-embedding.readthedocs.io.
