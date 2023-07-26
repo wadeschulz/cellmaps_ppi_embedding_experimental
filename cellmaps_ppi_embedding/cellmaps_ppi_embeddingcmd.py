@@ -10,6 +10,7 @@ from cellmaps_utils import constants
 import cellmaps_ppi_embedding
 from cellmaps_ppi_embedding.runner import Node2VecEmbeddingGenerator
 from cellmaps_ppi_embedding.runner import CellMapsPPIEmbedder
+from cellmaps_ppi_embedding.runner import FakeEmbeddingGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,8 @@ def _parse_arguments(desc, args):
                         help='--p value to pass to node2vec')
     parser.add_argument('--q', type=int, default=1,
                         help='--q value to pass to node2vec')
+    parser.add_argument('--fake_embedder', action='store_true',
+                        help='If set, generate fake embedding')
     parser.add_argument('--skip_logging', action='store_true',
                         help='If set, output.log, error.log and '
                              'task_#_start/finish.json '
@@ -89,15 +92,18 @@ def main(args):
 
     try:
         logutils.setup_cmd_logging(theargs)
-
-        gen = Node2VecEmbeddingGenerator(nx_network=nx.read_edgelist(CellMapsPPIEmbedder.get_apms_edgelist_file(theargs.inputdir),
-                                                                     delimiter='\t'),
-                                         dimensions=theargs.dimensions,
-                                         p=theargs.p,
-                                         q=theargs.q,
-                                         walk_length=theargs.walk_length,
-                                         num_walks=theargs.num_walks,
-                                         workers=theargs.workers)
+        if theargs.fake_embedder is True:
+            gen = FakeEmbeddingGenerator(theargs.inputdir,
+                                         dimensions=theargs.dimensions)
+        else:
+            gen = Node2VecEmbeddingGenerator(nx_network=nx.read_edgelist(CellMapsPPIEmbedder.get_apms_edgelist_file(theargs.inputdir),
+                                                                         delimiter='\t'),
+                                             dimensions=theargs.dimensions,
+                                             p=theargs.p,
+                                             q=theargs.q,
+                                             walk_length=theargs.walk_length,
+                                             num_walks=theargs.num_walks,
+                                             workers=theargs.workers)
 
         return CellMapsPPIEmbedder(outdir=theargs.outdir,
                                    embedding_generator=gen,
