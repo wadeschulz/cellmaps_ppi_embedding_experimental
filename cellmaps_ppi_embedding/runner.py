@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import os
-
+import numpy as np
 import time
 from datetime import date
 import logging
@@ -11,6 +11,8 @@ from node2vec import Node2Vec
 from cellmaps_utils import constants
 from cellmaps_utils import logutils
 from cellmaps_utils.provenance import ProvenanceUtil
+import warnings
+
 
 import cellmaps_ppi_embedding
 from cellmaps_ppi_embedding.exceptions import CellMapsPPIEmbeddingError
@@ -104,6 +106,54 @@ class Node2VecEmbeddingGenerator(EmbeddingGenerator):
             row.extend(model.wv[key].tolist())
             yield row
 
+class FakeEmbeddingGenerator(EmbeddingGenerator):
+    """
+    Fakes PPI embedding
+    """
+    def __init__(self, ppi_downloaddir,  dimensions=1024):
+        """
+        Constructor
+        
+        :param dimensions: Desired size of output embedding
+        :type dimensions: int
+        """
+        super().__init__(dimensions=dimensions)
+        
+        self._ppi_downloaddir = ppi_downloaddir
+        self._gene_list = self._get_gene_list()
+            
+        warnings.warn(constants.PPI_EMBEDDING_FILE +
+                      ' contains FAKE DATA!!!!\n'
+                      'You have been warned\nHave a nice day\n')
+        logger.error(constants.PPI_EMBEDDING_FILE +
+                     ' contains FAKE DATA!!!! '
+                     'You have been warned. Have a nice day')
+    
+    def _get_gene_list(self):
+        
+        ppi_gene_node_attrs_file = os.path.join(self._ppi_downloaddir, constants.PPI_GENE_NODE_ATTR_FILE)
+        gene_list = []
+
+        with open(ppi_gene_node_attrs_file, 'r') as f:
+            reader = csv.DictReader(f, delimiter='\t')
+            for row in reader:
+                gene_list.append(row['name'])
+        return gene_list
+            
+
+    def get_next_embedding(self):
+        """
+        Generator method for getting next embedding.
+        Caller should implement with ``yield`` operator
+
+        :raises: NotImplementedError: Subclasses should implement this
+        :return: Embedding
+        :rtype: list
+        """
+        for g in self._gene_list:
+            row = [g]
+            row.extend(np.random.normal(size=self.get_dimensions())) # sample normal distribution
+            yield row
 
 class CellMapsPPIEmbedder(object):
     """
