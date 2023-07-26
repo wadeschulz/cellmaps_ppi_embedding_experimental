@@ -106,6 +106,7 @@ class Node2VecEmbeddingGenerator(EmbeddingGenerator):
             row.extend(model.wv[key].tolist())
             yield row
 
+
 class FakeEmbeddingGenerator(EmbeddingGenerator):
     """
     Fakes PPI embedding
@@ -139,7 +140,6 @@ class FakeEmbeddingGenerator(EmbeddingGenerator):
             for row in reader:
                 gene_list.append(row['name'])
         return gene_list
-            
 
     def get_next_embedding(self):
         """
@@ -154,6 +154,7 @@ class FakeEmbeddingGenerator(EmbeddingGenerator):
             row = [g]
             row.extend(np.random.normal(size=self.get_dimensions())) # sample normal distribution
             yield row
+
 
 class CellMapsPPIEmbedder(object):
     """
@@ -290,10 +291,10 @@ class CellMapsPPIEmbedder(object):
                      'version': cellmaps_ppi_embedding.__version__,
                      'date-published': date.today().strftime('%m-%d-%Y')}
         self._embedding_file_id = self._provenance_utils.register_dataset(self._outdir,
-                                                                          source_file=self.get_ppi_embeddding_file(),
+                                                                          source_file=self.get_ppi_embedding_file(),
                                                                           data_dict=data_dict)
 
-    def get_ppi_embeddding_file(self):
+    def get_ppi_embedding_file(self):
         """
         Gets PPI embedding file in output directory
 
@@ -324,7 +325,7 @@ class CellMapsPPIEmbedder(object):
 
             self._register_software()
 
-            with open(self.get_ppi_embeddding_file(), 'w', newline='') as f:
+            with open(self.get_ppi_embedding_file(), 'w', newline='') as f:
                 writer = csv.writer(f, delimiter='\t')
                 header_line = ['']
                 header_line.extend([x for x in range(1, self._embedding_generator.get_dimensions())])

@@ -8,6 +8,8 @@ import unittest
 import tempfile
 import shutil
 import csv
+
+from cellmaps_utils.provenance import ProvenanceUtil
 from cellmaps_ppi_embedding.runner import CellMapsPPIEmbedder
 from cellmaps_ppi_embedding.runner import Node2VecEmbeddingGenerator
 from cellmaps_ppi_embedding.exceptions import CellMapsPPIEmbeddingError
@@ -43,9 +45,16 @@ class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
     def test_run_no_edgelist(self):
         temp_dir = tempfile.mkdtemp()
         try:
+            inputdir = os.path.join(temp_dir, 'input')
+            os.makedirs(inputdir, mode=0o755)
+            prov = ProvenanceUtil()
+            prov.register_rocrate(inputdir, name='name',
+                         organization_name='org', project_name='proj',
+                         guid='12345')
             rundir = os.path.join(temp_dir, 'run')
             gen = Node2VecEmbeddingGenerator(None)
             myobj = CellMapsPPIEmbedder(outdir=rundir,
+                                        inputdir=inputdir,
                                         embedding_generator=gen)
             myobj.run()
             self.fail('Expected exception')
