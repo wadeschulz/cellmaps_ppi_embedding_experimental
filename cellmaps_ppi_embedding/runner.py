@@ -186,6 +186,8 @@ class CellMapsPPIEmbedder(object):
         self._name = name
         self._project_name = project_name
         self._organization_name = organization_name
+        self._keywords = None
+        self._description = None
         self._input_data_dict = input_data_dict
         self._provenance_utils = provenance_utils
         if skip_logging is None:
@@ -216,6 +218,35 @@ class CellMapsPPIEmbedder(object):
                                        version=cellmaps_ppi_embedding.__version__,
                                        data={'commandlineargs': self._input_data_dict})
 
+    def _update_provenance_fields(self):
+        """
+
+        :return:
+        """
+        name, proj_name, org_name, description, keywords = self._provenance_utils.get_name_project_org_keyword_description_of_rocrate(
+            self._inputdir)
+
+        if self._name is None:
+            self._name = name
+
+        if self._organization_name is None:
+            self._organization_name = org_name
+
+        if self._project_name is None:
+            self._project_name = proj_name
+
+        # just grab 1st five elements assuming they are
+        # project, data_release_name, cell line, treatment,
+        # name_of_computation
+        if keywords is not None and len(keywords) >= 4:
+            self._keywords = keywords[:4]
+        else:
+            self._keywords = keywords
+
+        self._keywords.extend(['AP-MS Embedding', 'AP-MS', 'embedding'])
+
+        self._description = ' '.join(self._keywords)
+
     def _create_run_crate(self):
         """
         Creates rocrate for output directory
@@ -223,21 +254,14 @@ class CellMapsPPIEmbedder(object):
         :raises CellMapsProvenanceError: If there is an error
         """
         logger.debug('Registering rocrate with FAIRSCAPE')
-        name, proj_name, org_name = self._provenance_utils.get_name_project_org_of_rocrate(self._inputdir)
 
-        if self._name is not None:
-            name = self._name
-
-        if self._organization_name is not None:
-            org_name = self._organization_name
-
-        if self._project_name is not None:
-            proj_name = self._project_name
         try:
             self._provenance_utils.register_rocrate(self._outdir,
-                                                    name=name,
-                                                    organization_name=org_name,
-                                                    project_name=proj_name)
+                                                    name=self._name,
+                                                    organization_name=self._organization_name,
+                                                    project_name=self._project_name,
+                                                    description=self._description,
+                                                    keywords=self._keywords)
         except TypeError as te:
             raise CellMapsPPIEmbeddingError('Invalid provenance: ' + str(te))
         except KeyError as ke:
@@ -250,12 +274,17 @@ class CellMapsPPIEmbedder(object):
         :raises CellMapsImageEmbeddingError: If fairscape call fails
         """
         logger.debug('Registering software with FAIRSCAPE')
+        software_keywords = self._keywords
+        software_keywords.extend(['tools', cellmaps_ppi_embedding.__name__])
+        software_description = self._description + ' ' + \
+                               cellmaps_ppi_embedding.__description__
         self._softwareid = self._provenance_utils.register_software(self._outdir,
                                                                     name=cellmaps_ppi_embedding.__name__,
-                                                                    description=cellmaps_ppi_embedding.__description__,
+                                                                    description=software_description,
                                                                     author=cellmaps_ppi_embedding.__author__,
                                                                     version=cellmaps_ppi_embedding.__version__,
-                                                                    file_format='.py',
+                                                                    file_format='py',
+                                                                    keywords=software_keywords,
                                                                     url=cellmaps_ppi_embedding.__repo_url__)
 
     def _register_computation(self):
@@ -267,11 +296,15 @@ class CellMapsPPIEmbedder(object):
         input_dataset_id = self._provenance_utils.get_id_of_rocrate(self._inputdir)
 
         logger.debug('Registering computation with FAIRSCAPE')
+        keywords = self._keywords
+        keywords.extend(['computation'])
+        description = self._description + ' run of ' + cellmaps_ppi_embedding.__name__
         self._provenance_utils.register_computation(self._outdir,
                                                     name=cellmaps_ppi_embedding.__name__,
                                                     run_by=str(self._provenance_utils.get_login()),
                                                     command=str(self._input_data_dict),
-                                                    description='run of ' + cellmaps_ppi_embedding.__name__,
+                                                    description=description,
+                                                    keywords=keywords,
                                                     used_software=[self._softwareid],
                                                     used_dataset=[input_dataset_id],
                                                     generated=[self._embedding_file_id])
@@ -284,8 +317,13 @@ class CellMapsPPIEmbedder(object):
         :rtype: str
         """
         logger.debug('Registering embedding file with FAIRSCAPE')
+        description = self._description
+        description += ' file'
+        keywords = self._keywords
+        keywords.extend(['file'])
         data_dict = {'name': cellmaps_ppi_embedding.__name__ + ' output file',
-                     'description': 'PPI Embedding file',
+                     'description': description,
+                     'keywords': keywords,
                      'data-format': 'tsv',
                      'author': cellmaps_ppi_embedding.__name__,
                      'version': cellmaps_ppi_embedding.__version__,
@@ -320,6 +358,8 @@ class CellMapsPPIEmbedder(object):
                 logutils.setup_filelogger(outdir=self._outdir,
                                           handlerprefix='cellmaps_ppi_embedding')
                 self._write_task_start_json()
+
+            self._update_provenance_fields()
 
             self._create_run_crate()
 
