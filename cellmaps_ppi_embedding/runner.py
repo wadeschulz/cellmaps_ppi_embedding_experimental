@@ -223,29 +223,19 @@ class CellMapsPPIEmbedder(object):
 
         :return:
         """
-        name, proj_name, org_name, description, keywords = self._provenance_utils.get_name_project_org_keyword_description_of_rocrate(
-            self._inputdir)
+        prov_attrs = self._provenance_utils.get_merged_rocrate_provenance_attrs(self._inputdir,
+                                                                                override_name=self._name,
+                                                                                override_project_name=self._project_name,
+                                                                                override_organization_name=self._organization_name,
+                                                                                extra_keywords=['AP-MS Embedding',
+                                                                                                'AP-MS',
+                                                                                                'embedding'])
 
-        if self._name is None:
-            self._name = name
-
-        if self._organization_name is None:
-            self._organization_name = org_name
-
-        if self._project_name is None:
-            self._project_name = proj_name
-
-        # just grab 1st five elements assuming they are
-        # project, data_release_name, cell line, treatment,
-        # name_of_computation
-        if keywords is not None and len(keywords) >= 4:
-            self._keywords = keywords[:4]
-        else:
-            self._keywords = keywords
-
-        self._keywords.extend(['AP-MS Embedding', 'AP-MS', 'embedding'])
-
-        self._description = ' '.join(self._keywords)
+        self._name = prov_attrs.get_name()
+        self._organization_name = prov_attrs.get_organization_name()
+        self._project_name = prov_attrs.get_project_name()
+        self._keywords = prov_attrs.get_keywords()
+        self._description = prov_attrs.get_description()
 
     def _create_run_crate(self):
         """
