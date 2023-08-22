@@ -9,8 +9,17 @@ from setuptools import setup, find_packages
 
 with open(os.path.join('cellmaps_ppi_embedding', '__init__.py')) as ver_file:
     for line in ver_file:
+        line = line.rstrip()
         if line.startswith('__version__'):
             version=re.sub("'", "", line[line.index("'"):])
+        elif line.startswith('__description__'):
+            desc = re.sub("'", "", line[line.index("'"):])
+        elif line.startswith('__repo_url__'):
+            repo_url = re.sub("'", "", line[line.index("'"):])
+        elif line.startswith('__author__'):
+            author = re.sub("'", "", line[line.index("'"):])
+        elif line.startswith('__email__'):
+            email = re.sub("'", "", line[line.index("'"):])
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -27,8 +36,8 @@ setup_requirements = [ ]
 test_requirements = [ ]
 
 setup(
-    author="Mayank Jain",
-    author_email='maj014@ucsd.edu',
+    author=author,
+    author_email=email,
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
@@ -39,7 +48,7 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
     ],
-    description="A tool to generate embeddings from networks for CM4AI pipeline",
+    description=desc,
     install_requires=requirements,
     license="MIT license",
     long_description=readme + '\n\n' + history,
@@ -53,6 +62,6 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/idekerlab/cellmaps_ppi_embedding',
+    url=repo_url,
     version=version,
     zip_safe=False)
