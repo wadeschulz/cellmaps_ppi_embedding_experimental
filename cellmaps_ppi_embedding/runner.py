@@ -290,7 +290,7 @@ class CellMapsPPIEmbedder(object):
         keywords.extend(['computation'])
         description = self._description + ' run of ' + cellmaps_ppi_embedding.__name__
         self._provenance_utils.register_computation(self._outdir,
-                                                    name=cellmaps_ppi_embedding.__name__,
+                                                    name=cellmaps_ppi_embedding.__computation_name__,
                                                     run_by=str(self._provenance_utils.get_login()),
                                                     command=str(self._input_data_dict),
                                                     description=description,
