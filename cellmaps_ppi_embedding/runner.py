@@ -317,7 +317,7 @@ class CellMapsPPIEmbedder(object):
                      'data-format': 'tsv',
                      'author': cellmaps_ppi_embedding.__name__,
                      'version': cellmaps_ppi_embedding.__version__,
-                     'date-published': date.today().strftime('%m-%d-%Y')}
+                     'date-published': date.today().strftime(self._provenance_utils.get_default_date_format_str())}
         self._embedding_file_id = self._provenance_utils.register_dataset(self._outdir,
                                                                           source_file=self.get_ppi_embedding_file(),
                                                                           data_dict=data_dict)
