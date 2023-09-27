@@ -20,6 +20,7 @@ Generate embeddings from Protein-Protein interaction networks using `node2vec <h
 
    installation
    usage
+   outputs
    modules
    developer
    authors
