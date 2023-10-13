@@ -114,24 +114,24 @@ class FakeEmbeddingGenerator(EmbeddingGenerator):
     def __init__(self, ppi_downloaddir,  dimensions=1024):
         """
         Constructor
-        
+
         :param dimensions: Desired size of output embedding
         :type dimensions: int
         """
         super().__init__(dimensions=dimensions)
-        
+
         self._ppi_downloaddir = ppi_downloaddir
         self._gene_list = self._get_gene_list()
-            
+
         warnings.warn(constants.PPI_EMBEDDING_FILE +
                       ' contains FAKE DATA!!!!\n'
                       'You have been warned\nHave a nice day\n')
         logger.error(constants.PPI_EMBEDDING_FILE +
                      ' contains FAKE DATA!!!! '
                      'You have been warned. Have a nice day')
-    
+
     def _get_gene_list(self):
-        
+
         ppi_gene_node_attrs_file = os.path.join(self._ppi_downloaddir, constants.PPI_GENE_NODE_ATTR_FILE)
         gene_list = []
 
@@ -163,16 +163,27 @@ class CellMapsPPIEmbedder(object):
     def __init__(self, outdir=None,
                  embedding_generator=None,
                  inputdir=None,
-                 skip_logging=False,
+                 skip_logging=True,
                  name=None,
                  organization_name=None,
                  project_name=None,
                  provenance_utils=ProvenanceUtil(),
                  input_data_dict=None):
         """
+        Constructor
 
-        :param skip_logging:
-        :param misc_info_dict:
+        :param outdir: directory where ppi embeddings will be saved
+        :type outdir: str
+        :param embedding_generator
+        :type embedding_generator
+        :param inputdir
+        :type inputdir: str
+        :param skip_logging: If ``True`` skip logging, if ``None`` or ``False`` do NOT skip logging
+        :type skip_logging: bool
+        :param provenance:
+        :type provenance: dict
+        :param input_data_dict:
+        :type input_data_dict: dict
         """
         if outdir is None:
             raise CellMapsPPIEmbeddingError('outdir is None')
@@ -347,7 +358,7 @@ class CellMapsPPIEmbedder(object):
             if self._skip_logging is False:
                 logutils.setup_filelogger(outdir=self._outdir,
                                           handlerprefix='cellmaps_ppi_embedding')
-                self._write_task_start_json()
+            self._write_task_start_json()
 
             self._update_provenance_fields()
 
@@ -370,10 +381,9 @@ class CellMapsPPIEmbedder(object):
 
         finally:
             self._end_time = int(time.time())
-            if self._skip_logging is False:
-                # write a task finish file
-                logutils.write_task_finish_json(outdir=self._outdir,
-                                                start_time=self._start_time,
-                                                end_time=self._end_time,
-                                                status=exitcode)
+            # write a task finish file
+            logutils.write_task_finish_json(outdir=self._outdir,
+                                            start_time=self._start_time,
+                                            end_time=self._end_time,
+                                            status=exitcode)
         return exitcode

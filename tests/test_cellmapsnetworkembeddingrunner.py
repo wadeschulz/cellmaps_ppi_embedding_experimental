@@ -8,7 +8,9 @@ import unittest
 import tempfile
 import shutil
 import csv
+from unittest.mock import MagicMock
 
+from cellmaps_utils.exceptions import CellMapsProvenanceError
 from cellmaps_utils.provenance import ProvenanceUtil
 from cellmaps_ppi_embedding.runner import CellMapsPPIEmbedder
 from cellmaps_ppi_embedding.runner import Node2VecEmbeddingGenerator
@@ -85,5 +87,58 @@ class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
                 for g in ['ABC', 'DEF']:
                     self.assertTrue(g in resmap)
                     self.assertEqual(1024, len(resmap[g]))
+        finally:
+            shutil.rmtree(temp_dir)
+
+    def test_run_without_logging(self):
+        """ Tests run() without logging."""
+        temp_dir = tempfile.mkdtemp()
+        try:
+            run_dir = os.path.join(temp_dir, 'run')
+
+            mock_embedding_generator = MagicMock()
+            mock_embedding_generator.get_dimensions.return_value = 1024
+            mock_embedding_generator.get_next_embedding.return_value = iter([])
+
+            myobj = CellMapsPPIEmbedder(outdir=run_dir,
+                                        embedding_generator=mock_embedding_generator,
+                                        skip_logging=True)
+
+            try:
+                myobj.run()
+                self.fail('Expected CellMapsProvenanceError')
+            except CellMapsProvenanceError as e:
+                print(e)
+                self.assertTrue('rocrate' in str(e))
+
+            self.assertFalse(os.path.isfile(os.path.join(run_dir, 'output.log')))
+            self.assertFalse(os.path.isfile(os.path.join(run_dir, 'error.log')))
+
+        finally:
+            shutil.rmtree(temp_dir)
+
+    def test_run_with_logging(self):
+        """ Tests run() with logging."""
+        temp_dir = tempfile.mkdtemp()
+        try:
+            run_dir = os.path.join(temp_dir, 'run')
+
+            mock_embedding_generator = MagicMock()
+            mock_embedding_generator.get_dimensions.return_value = 1024
+            mock_embedding_generator.get_next_embedding.return_value = iter([])
+
+            myobj = CellMapsPPIEmbedder(outdir=run_dir,
+                                        embedding_generator=mock_embedding_generator,
+                                        skip_logging=False)
+
+            try:
+                myobj.run()
+                self.fail('Expected CellMapsProvenanceError')
+            except CellMapsProvenanceError as e:
+                self.assertTrue('rocrate' in str(e))
+
+            self.assertTrue(os.path.isfile(os.path.join(run_dir, 'output.log')))
+            self.assertTrue(os.path.isfile(os.path.join(run_dir, 'error.log')))
+
         finally:
             shutil.rmtree(temp_dir)
