@@ -45,7 +45,7 @@ def _parse_arguments(desc, args):
                         help='--q value to pass to node2vec')
     parser.add_argument('--fake_embedder', action='store_true',
                         help='If set, generate fake embedding')
-    parser.add_argument('--skip_logging', type=_str2bool, default=True,
+    parser.add_argument('--skip_logging', action='store_true',
                         help='If set, output.log, error.log and '
                              'task_#_start/finish.json '
                              'files will not be created')
@@ -67,15 +67,6 @@ def _parse_arguments(desc, args):
                                  cellmaps_ppi_embedding.__version__))
 
     return parser.parse_args(args)
-
-
-def _str2bool(v):
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
 def main(args):
