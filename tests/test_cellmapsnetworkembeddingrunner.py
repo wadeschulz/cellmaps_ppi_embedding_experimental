@@ -50,7 +50,7 @@ class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
             inputdir = os.path.join(temp_dir, 'input')
             os.makedirs(inputdir, mode=0o755)
             prov = ProvenanceUtil()
-            prov.register_rocrate(inputdir, name='name',
+            prov.register_rocrate(inputdir, name='name must be longer',
                          organization_name='org', project_name='proj',
                          guid='12345')
             rundir = os.path.join(temp_dir, 'run')
