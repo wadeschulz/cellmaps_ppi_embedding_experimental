@@ -46,8 +46,7 @@ def _parse_arguments(desc, args):
     parser.add_argument('--fake_embedder', action='store_true',
                         help='If set, generate fake embedding')
     parser.add_argument('--skip_logging', action='store_true',
-                        help='If set, output.log, error.log and '
-                             'task_#_start/finish.json '
+                        help='If set, output.log, error.log '
                              'files will not be created')
     parser.add_argument('--logconf', default=None,
                         help='Path to python logging configuration file in '
