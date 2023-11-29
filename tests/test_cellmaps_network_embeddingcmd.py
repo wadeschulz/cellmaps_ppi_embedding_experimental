@@ -27,7 +27,7 @@ class TestCellmapsNetworkEmbedding(unittest.TestCase):
                                                               '--input',
                                                               'somefile'])
 
-        self.assertEqual(0, res.verbose, 0)
+        self.assertEqual(1, res.verbose, 0)
         self.assertEqual('outdir', res.outdir)
         self.assertEqual('somefile', res.inputdir)
         self.assertEqual(2, res.p)
@@ -39,7 +39,7 @@ class TestCellmapsNetworkEmbedding(unittest.TestCase):
                     '--inputdir', 'somefile']
         res = cellmaps_ppi_embeddingcmd._parse_arguments('hi', someargs)
 
-        self.assertEqual(2, res.verbose)
+        self.assertEqual(3, res.verbose)
         self.assertEqual('hi', res.logconf)
 
     def test_main(self):
