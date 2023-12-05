@@ -85,6 +85,5 @@ Via Docker
 
 .. code-block::
 
-   docker run -v `pwd`:`pwd` -w `pwd` idekerlab/cellmaps_ppi_embedding:0.1.0 cellmaps_ppi_embeddingcmd.py ./cellmaps_ppi_embedding_outdir --inputdir ./cellmaps_ppidownloader_outdir
-
+   Coming soon...
 
