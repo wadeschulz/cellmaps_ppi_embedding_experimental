@@ -11,6 +11,9 @@ Outputs
 - ``ppi_emd.tsv``:
     A TSV file that contains the embeddings for the protein-protein interactions (PPIs). The first column consists of gene names, followed by the embedding vectors in subsequent columns.
 
+.. image:: images/ppi_embed.png
+  :alt: A fragment of ppi_embed.tsv file
+
 Logs and Metadata
 -----------------
 
