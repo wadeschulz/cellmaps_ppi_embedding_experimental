@@ -11,6 +11,16 @@ Outputs
 - ``ppi_emd.tsv``:
     A TSV file that contains the embeddings for the protein-protein interactions (PPIs). The first column consists of gene names, followed by the embedding vectors in subsequent columns.
 
+.. code-block::
+
+            1	2	3	4
+    HDAC2	0.00322267	0.068772331	0.087871492	0.074549779
+    SMARCA4	0.014913903	-0.025018152	-0.01334604	-0.050020121
+    DNMT3A	0.030166976	0.082494646	0.083659336	-0.005459526
+    KDM6A	0.058055822	0.151974067	0.122265264	0.057505969
+    RPS4X	0.016731756	0.046027087	0.041698962	0.010518731
+
+
 Logs and Metadata
 -----------------
 
