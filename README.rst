@@ -13,6 +13,10 @@ Cell Maps PPI Embedder
         :target: https://cellmaps-ppi-embedding.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
+.. image:: https://zenodo.org/badge/618128210.svg
+        :target: https://zenodo.org/doi/10.5281/zenodo.10607492
+        :alt: Zenodo DOI badge
+
 
 
 
