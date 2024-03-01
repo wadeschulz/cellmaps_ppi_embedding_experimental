@@ -20,6 +20,13 @@ The directory should contain following files:
 - ``ppi_gene_node_attributes.tsv``
     Contains attributes for each gene node in the protein-protein interaction network. This includes information like gene names, ensembl ID, and other relevant data.
 
+    The code directly references only ``name`` column, which is required but also other columns may be present:
+
+    * name - contains the gene symbol. In some cases, it can contain an ensembl ID or another query, that mygene was queried with.
+    * represents - a comma-separated list of Ensembl gene IDs that the gene symbol represents.
+    * ambiguous - a comma-separated list of gene symbols that are considered ambiguous.
+    * bait - the bait column contains Boolean values (TRUE or FALSE) indicating whether the gene is considered a "bait" in the context of affinity purification mass spectrometry (APMS) experiments. Baits are proteins of interest that are used to pull down interacting partners (preys) from a cell extract. A value of TRUE suggests that the gene is used as a bait in such experiments, as determined by its presence in a provided bait_set.
+
 .. code-block::
 
     name	represents	ambiguous	bait
