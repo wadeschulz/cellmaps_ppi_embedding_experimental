@@ -16,7 +16,7 @@ Cell Maps PPI Embedder
 Generate embeddings from Protein-Protein interaction networks using `node2vec <https://arxiv.org/abs/1607.00653>`__
 
 * Free software: MIT license
-
+* Source code: https://github.com/idekerlab/cellmaps_ppi_embedding
 
 .. toctree::
    :maxdepth: 2
