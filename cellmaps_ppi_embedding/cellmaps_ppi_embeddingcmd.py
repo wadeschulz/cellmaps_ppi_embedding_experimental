@@ -45,6 +45,18 @@ def _parse_arguments(desc, args):
                         help='--q value to pass to node2vec')
     parser.add_argument('--fake_embedder', action='store_true',
                         help='If set, generate fake embedding')
+    parser.add_argument('--name',
+                        help='Name of this run, needed for FAIRSCAPE. If '
+                             'unset, name value from specified '
+                             'by --inputdir directory will be used')
+    parser.add_argument('--organization_name',
+                        help='Name of organization running this tool, needed '
+                             'for FAIRSCAPE. If unset, organization name specified '
+                             'in --inputdir directory will be used')
+    parser.add_argument('--project_name',
+                        help='Name of project running this tool, needed for '
+                             'FAIRSCAPE. If unset, project name specified '
+                             'in --input directory will be used')
     parser.add_argument('--skip_logging', action='store_true',
                         help='If set, output.log, error.log '
                              'files will not be created')
@@ -107,6 +119,9 @@ def main(args):
         return CellMapsPPIEmbedder(outdir=theargs.outdir,
                                    embedding_generator=gen,
                                    skip_logging=theargs.skip_logging,
+                                   name=theargs.name,
+                                   organization_name=theargs.organization_name,
+                                   project_name=theargs.project_name,
                                    inputdir=theargs.inputdir,
                                    input_data_dict=theargs.__dict__).run()
     except Exception as e:
