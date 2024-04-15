@@ -1,3 +1,4 @@
+scipy<1.13.0
 cellmaps_utils
 node2vec
 networkx
