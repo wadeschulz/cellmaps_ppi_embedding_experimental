@@ -29,7 +29,8 @@ with open('HISTORY.rst') as history_file:
 
 requirements = ['cellmaps_utils',
                 'node2vec',
-                'networkx']
+                'networkx',
+                'scipy<1.13.0']
 
 setup_requirements = [ ]
 
