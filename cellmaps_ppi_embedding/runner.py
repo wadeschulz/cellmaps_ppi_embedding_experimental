@@ -174,9 +174,9 @@ class CellMapsPPIEmbedder(object):
 
         :param outdir: directory where ppi embeddings will be saved
         :type outdir: str
-        :param embedding_generator
-        :type embedding_generator
-        :param inputdir
+        :param embedding_generator:
+        :type embedding_generator:
+        :param inputdir:
         :type inputdir: str
         :param skip_logging: If ``True`` skip logging, if ``None`` or ``False`` do NOT skip logging
         :type skip_logging: bool

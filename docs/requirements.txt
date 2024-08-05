@@ -1,3 +1,7 @@
 Sphinx>=1.8.1
 sphinx-rtd-theme
 sphinx-copybutton
+scipy<1.13.0
+cellmaps_utils
+node2vec
+networkx
