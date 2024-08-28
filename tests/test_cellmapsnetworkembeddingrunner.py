@@ -30,8 +30,7 @@ class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
         """Tests constructor"""
         temp_dir = tempfile.mkdtemp()
         try:
-            myobj = CellMapsPPIEmbedder(outdir=os.path.join(temp_dir,
-                                                                       'out'))
+            myobj = CellMapsPPIEmbedder(outdir=os.path.join(temp_dir, 'out'))
             self.assertIsNotNone(myobj)
         finally:
             shutil.rmtree(temp_dir)
@@ -101,15 +100,11 @@ class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
             mock_embedding_generator.get_next_embedding.return_value = iter([])
 
             myobj = CellMapsPPIEmbedder(outdir=run_dir,
+                                        inputdir='inputdir',
+                                        provenance={},
                                         embedding_generator=mock_embedding_generator,
                                         skip_logging=True)
-
-            try:
-                myobj.run()
-                self.fail('Expected CellMapsProvenanceError')
-            except CellMapsProvenanceError as e:
-                print(e)
-                self.assertTrue('rocrate' in str(e))
+            myobj.run()
 
             self.assertFalse(os.path.isfile(os.path.join(run_dir, 'output.log')))
             self.assertFalse(os.path.isfile(os.path.join(run_dir, 'error.log')))
@@ -128,14 +123,11 @@ class TestCellmapsNetworkEmbeddingRunner(unittest.TestCase):
             mock_embedding_generator.get_next_embedding.return_value = iter([])
 
             myobj = CellMapsPPIEmbedder(outdir=run_dir,
+                                        inputdir='inputdir',
+                                        provenance={},
                                         embedding_generator=mock_embedding_generator,
                                         skip_logging=False)
-
-            try:
-                myobj.run()
-                self.fail('Expected CellMapsProvenanceError')
-            except CellMapsProvenanceError as e:
-                self.assertTrue('rocrate' in str(e))
+            myobj.run()
 
             self.assertTrue(os.path.isfile(os.path.join(run_dir, 'output.log')))
             self.assertTrue(os.path.isfile(os.path.join(run_dir, 'error.log')))

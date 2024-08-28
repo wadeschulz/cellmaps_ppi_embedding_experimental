@@ -193,7 +193,7 @@ class CellMapsPPIEmbedder(object):
             raise CellMapsPPIEmbeddingError('outdir is None')
 
         self._outdir = os.path.abspath(outdir)
-        self._inputdir = os.path.abspath(inputdir)
+        self._inputdir = os.path.abspath(inputdir) if inputdir is not None else inputdir
         self._start_time = int(time.time())
         self._end_time = -1
         self._embedding_generator = embedding_generator
@@ -255,9 +255,11 @@ class CellMapsPPIEmbedder(object):
             self._keywords = prov_attrs.get_keywords()
             self._description = prov_attrs.get_description()
         elif self._provenance is not None:
-            self._name = self._provenance['name']
-            self._organization_name = self._provenance['organization-name']
-            self._project_name = self._provenance['project-name']
+            self._name = self._provenance['name'] if 'name' in self._provenance else 'PPI Embedding'
+            self._organization_name = self._provenance['organization-name'] \
+                if 'organization-name' in self._provenance else 'NA'
+            self._project_name = self._provenance['project-name']\
+                if 'project-name' in self._provenance else 'NA'
             self._keywords = self._provenance['keywords'] if 'keywords' in self._provenance else ['ppi']
             self._description = self._provenance['description'] if 'description' in self._provenance else \
                 'Embedding of PPIs'
@@ -336,6 +338,9 @@ class CellMapsPPIEmbedder(object):
         adding values to **self._inputdataset_ids**
 
         """
+        if CellMapsPPIEmbedder.PPI_EDGELIST_FILEKEY not in self._provenance:
+            logger.debug('Provenance information for input file (PPI edgelist) was not specified.')
+            return
         ppi_edgelist_datasetid = None
         if 'guid' in self._provenance[CellMapsPPIEmbedder.PPI_EDGELIST_FILEKEY]:
             ppi_edgelist_datasetid = self._provenance[CellMapsPPIEmbedder.PPI_EDGELIST_FILEKEY]['guid']
@@ -344,12 +349,11 @@ class CellMapsPPIEmbedder(object):
             self._inputdataset_ids.append(ppi_edgelist_datasetid)
             logger.debug('PPI edgelist have dataset id.')
         else:
-            if CellMapsPPIEmbedder.PPI_EDGELIST_FILEKEY in self._provenance:
-                ppi_edgelist_datasetid = self._provenance_utils.register_dataset(
-                    self._outdir, source_file=self.get_apms_edgelist_file(self._inputdir),
-                    data_dict=self._provenance[CellMapsPPIEmbedder.PPI_EDGELIST_FILEKEY], skip_copy=False)
-                self._inputdataset_ids.append(ppi_edgelist_datasetid)
-                logger.debug('PPI edgelist dataset id: ' + str(ppi_edgelist_datasetid))
+            ppi_edgelist_datasetid = self._provenance_utils.register_dataset(
+                self._outdir, source_file=self.get_apms_edgelist_file(self._inputdir),
+                data_dict=self._provenance[CellMapsPPIEmbedder.PPI_EDGELIST_FILEKEY], skip_copy=False)
+            self._inputdataset_ids.append(ppi_edgelist_datasetid)
+            logger.debug('PPI edgelist dataset id: ' + str(ppi_edgelist_datasetid))
 
     def _register_embedding_file(self):
         """
