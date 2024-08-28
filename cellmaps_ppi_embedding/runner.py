@@ -13,10 +13,8 @@ from cellmaps_utils import logutils
 from cellmaps_utils.provenance import ProvenanceUtil
 import warnings
 
-
 import cellmaps_ppi_embedding
 from cellmaps_ppi_embedding.exceptions import CellMapsPPIEmbeddingError
-
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +24,7 @@ class EmbeddingGenerator(object):
     Base class for implementations that generate
     network embeddings
     """
+
     def __init__(self, dimensions=1024):
         """
         Constructor
@@ -57,6 +56,7 @@ class Node2VecEmbeddingGenerator(EmbeddingGenerator):
     """
 
     """
+
     def __init__(self, nx_network, p=2, q=1, dimensions=1024,
                  walk_length=80, num_walks=80, workers=8):
         """
@@ -111,7 +111,8 @@ class FakeEmbeddingGenerator(EmbeddingGenerator):
     """
     Fakes PPI embedding
     """
-    def __init__(self, ppi_downloaddir,  dimensions=1024):
+
+    def __init__(self, ppi_downloaddir, dimensions=1024):
         """
         Constructor
 
@@ -152,7 +153,7 @@ class FakeEmbeddingGenerator(EmbeddingGenerator):
         """
         for g in self._gene_list:
             row = [g]
-            row.extend(np.random.normal(size=self.get_dimensions())) # sample normal distribution
+            row.extend(np.random.normal(size=self.get_dimensions()))  # sample normal distribution
             yield row
 
 
@@ -160,6 +161,8 @@ class CellMapsPPIEmbedder(object):
     """
     Class to run algorithm
     """
+    PPI_EDGELIST_FILEKEY = 'edgelist'
+
     def __init__(self, outdir=None,
                  embedding_generator=None,
                  inputdir=None,
@@ -168,7 +171,8 @@ class CellMapsPPIEmbedder(object):
                  organization_name=None,
                  project_name=None,
                  provenance_utils=ProvenanceUtil(),
-                 input_data_dict=None):
+                 input_data_dict=None,
+                 provenance=None):
         """
         Constructor
 
@@ -189,10 +193,9 @@ class CellMapsPPIEmbedder(object):
             raise CellMapsPPIEmbeddingError('outdir is None')
 
         self._outdir = os.path.abspath(outdir)
-        self._inputdir = inputdir
+        self._inputdir = os.path.abspath(inputdir)
         self._start_time = int(time.time())
         self._end_time = -1
-        self._input_data_dict = input_data_dict
         self._embedding_generator = embedding_generator
         self._name = name
         self._project_name = project_name
@@ -201,6 +204,8 @@ class CellMapsPPIEmbedder(object):
         self._description = None
         self._input_data_dict = input_data_dict
         self._provenance_utils = provenance_utils
+        self._provenance = provenance
+        self._inputdataset_ids = []
         if skip_logging is None:
             self._skip_logging = False
         else:
@@ -212,7 +217,8 @@ class CellMapsPPIEmbedder(object):
     def get_apms_edgelist_file(input_dir=None,
                                edgelist_filename=constants.PPI_EDGELIST_FILE):
         """
-
+        :param edgelist_filename:
+        :return:
         :param input_dir:
         :return:
         """
@@ -234,19 +240,29 @@ class CellMapsPPIEmbedder(object):
 
         :return:
         """
-        prov_attrs = self._provenance_utils.get_merged_rocrate_provenance_attrs(self._inputdir,
-                                                                                override_name=self._name,
-                                                                                override_project_name=self._project_name,
-                                                                                override_organization_name=self._organization_name,
-                                                                                extra_keywords=['AP-MS Embedding',
-                                                                                                'AP-MS',
-                                                                                                'embedding'])
+        if os.path.exists(os.path.join(self._inputdir, constants.RO_CRATE_METADATA_FILE)):
+            prov_attrs = self._provenance_utils.get_merged_rocrate_provenance_attrs(self._inputdir,
+                                                                                    override_name=self._name,
+                                                                                    override_project_name=self._project_name,
+                                                                                    override_organization_name=self._organization_name,
+                                                                                    extra_keywords=['AP-MS Embedding',
+                                                                                                    'AP-MS',
+                                                                                                    'embedding'])
 
-        self._name = prov_attrs.get_name()
-        self._organization_name = prov_attrs.get_organization_name()
-        self._project_name = prov_attrs.get_project_name()
-        self._keywords = prov_attrs.get_keywords()
-        self._description = prov_attrs.get_description()
+            self._name = prov_attrs.get_name()
+            self._organization_name = prov_attrs.get_organization_name()
+            self._project_name = prov_attrs.get_project_name()
+            self._keywords = prov_attrs.get_keywords()
+            self._description = prov_attrs.get_description()
+        elif self._provenance is not None:
+            self._name = self._provenance['name']
+            self._organization_name = self._provenance['organization-name']
+            self._project_name = self._provenance['project-name']
+            self._keywords = self._provenance['keywords'] if 'keywords' in self._provenance else ['ppi']
+            self._description = self._provenance['description'] if 'description' in self._provenance else \
+                'Embedding of PPIs'
+        else:
+            raise CellMapsPPIEmbeddingError('Input directory should be an RO-Crate or provenance should be specified.')
 
     def _create_run_crate(self):
         """
@@ -294,7 +310,10 @@ class CellMapsPPIEmbedder(object):
         :return:
         """
         logger.debug('Getting id of input rocrate')
-        input_dataset_id = self._provenance_utils.get_id_of_rocrate(self._inputdir)
+        if os.path.exists(os.path.join(self._inputdir, constants.RO_CRATE_METADATA_FILE)):
+            self._inputdataset_ids.append(self._provenance_utils.get_id_of_rocrate(self._inputdir))
+        else:
+            self._register_input_datasets()
 
         logger.debug('Registering computation with FAIRSCAPE')
         keywords = self._keywords
@@ -307,8 +326,30 @@ class CellMapsPPIEmbedder(object):
                                                     description=description,
                                                     keywords=keywords,
                                                     used_software=[self._softwareid],
-                                                    used_dataset=[input_dataset_id],
+                                                    used_dataset=self._inputdataset_ids,
                                                     generated=[self._embedding_file_id])
+
+    def _register_input_datasets(self):
+        """
+        Registers cm4ai/apms dataset or samples and unique input
+        datasets with FAIRSCAPE
+        adding values to **self._inputdataset_ids**
+
+        """
+        ppi_edgelist_datasetid = None
+        if 'guid' in self._provenance[CellMapsPPIEmbedder.PPI_EDGELIST_FILEKEY]:
+            ppi_edgelist_datasetid = self._provenance[CellMapsPPIEmbedder.PPI_EDGELIST_FILEKEY]['guid']
+
+        if ppi_edgelist_datasetid is not None:
+            self._inputdataset_ids.append(ppi_edgelist_datasetid)
+            logger.debug('PPI edgelist have dataset id.')
+        else:
+            if CellMapsPPIEmbedder.PPI_EDGELIST_FILEKEY in self._provenance:
+                ppi_edgelist_datasetid = self._provenance_utils.register_dataset(
+                    self._outdir, source_file=self.get_apms_edgelist_file(self._inputdir),
+                    data_dict=self._provenance[CellMapsPPIEmbedder.PPI_EDGELIST_FILEKEY], skip_copy=False)
+                self._inputdataset_ids.append(ppi_edgelist_datasetid)
+                logger.debug('PPI edgelist dataset id: ' + str(ppi_edgelist_datasetid))
 
     def _register_embedding_file(self):
         """
