@@ -78,7 +78,7 @@ Output:
    dockerpush           push image to dockerhub
 
 
-Before running tests, please install ``pip install -r requirements_dev``
+Before running tests, please install: ``pip install -r requirements_dev.txt``.
 
 For developers
 -------------------------------------------
