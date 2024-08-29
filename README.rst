@@ -125,7 +125,7 @@ Via Docker
 
 .. code-block::
 
-   Coming soon ...
+   Coming soon ... ...
 
 Credits
 -------
