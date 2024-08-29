@@ -35,8 +35,6 @@ requirements = ['scipy<1.13.0',
 
 setup_requirements = [ ]
 
-test_requirements = [ ]
-
 setup(
     author=author,
     author_email=email,
@@ -62,8 +60,6 @@ setup(
     package_dir={'cellmaps_ppi_embedding': 'cellmaps_ppi_embedding'},
     scripts=['cellmaps_ppi_embedding/cellmaps_ppi_embeddingcmd.py'],
     setup_requires=setup_requirements,
-    test_suite='tests',
-    tests_require=test_requirements,
     url=repo_url,
     version=version,
     zip_safe=False)
