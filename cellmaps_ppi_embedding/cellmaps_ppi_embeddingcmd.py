@@ -30,7 +30,7 @@ def _parse_arguments(desc, args):
     parser = argparse.ArgumentParser(description=desc,
                                      formatter_class=constants.ArgParseFormatter)
     parser.add_argument('outdir', help='Output directory')
-    parser.add_argument('--inputdir',
+    parser.add_argument('--inputdir', required=True,
                         help='Directory where ppi_edgelist.tsv file resides')
     parser.add_argument('--dimensions', type=int, default=1024,
                         help='Size of embedding to generate')
