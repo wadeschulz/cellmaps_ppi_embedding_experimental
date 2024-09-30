@@ -58,6 +58,7 @@ setup(
     name='cellmaps_ppi_embedding',
     packages=find_packages(include=['cellmaps_ppi_embedding']),
     package_dir={'cellmaps_ppi_embedding': 'cellmaps_ppi_embedding'},
+    package_data={'cellmaps_ppi_embedding': ['readme_outputs.txt']},
     scripts=['cellmaps_ppi_embedding/cellmaps_ppi_embeddingcmd.py'],
     setup_requires=setup_requirements,
     url=repo_url,
