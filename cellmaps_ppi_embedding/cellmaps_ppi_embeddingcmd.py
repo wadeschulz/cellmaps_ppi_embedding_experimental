@@ -9,7 +9,7 @@ import networkx as nx
 from cellmaps_utils import logutils
 from cellmaps_utils import constants
 import cellmaps_ppi_embedding
-from cellmaps_ppi_embedding.runner import Node2VecEmbeddingGenerator
+from cellmaps_ppi_embedding.runner import Node2VecEmbeddingGenerator, EmbeddingGenerator
 from cellmaps_ppi_embedding.runner import CellMapsPPIEmbedder
 from cellmaps_ppi_embedding.runner import FakeEmbeddingGenerator
 
@@ -32,17 +32,17 @@ def _parse_arguments(desc, args):
     parser.add_argument('outdir', help='Output directory')
     parser.add_argument('--inputdir', required=True,
                         help='Directory where ppi_edgelist.tsv file resides')
-    parser.add_argument('--dimensions', type=int, default=1024,
+    parser.add_argument('--dimensions', type=int, default=EmbeddingGenerator.DIMENSIONS,
                         help='Size of embedding to generate')
-    parser.add_argument('--walk_length', type=int, default=80,
+    parser.add_argument('--walk_length', type=int, default=Node2VecEmbeddingGenerator.WALK_LENGTH,
                         help='Walk Length')
-    parser.add_argument('--num_walks', type=int, default=10,
+    parser.add_argument('--num_walks', type=int, default=Node2VecEmbeddingGenerator.NUM_WALKS,
                         help='Num walks')
-    parser.add_argument('--workers', type=int, default=8,
+    parser.add_argument('--workers', type=int, default=Node2VecEmbeddingGenerator.WORKERS,
                         help='Number of workers')
-    parser.add_argument('--p', type=int, default=2,
+    parser.add_argument('--p', type=int, default=Node2VecEmbeddingGenerator.P_DEFAULT,
                         help='--p value to pass to node2vec')
-    parser.add_argument('--q', type=int, default=1,
+    parser.add_argument('--q', type=int, default=Node2VecEmbeddingGenerator.Q_DEFAULT,
                         help='--q value to pass to node2vec')
     parser.add_argument('--fake_embedder', action='store_true',
                         help='If set, generate fake embedding')

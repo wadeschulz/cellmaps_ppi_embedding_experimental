@@ -24,8 +24,9 @@ class EmbeddingGenerator(object):
     Base class for implementations that generate
     network embeddings
     """
+    DIMENSIONS = 1024
 
-    def __init__(self, dimensions=1024):
+    def __init__(self, dimensions=DIMENSIONS):
         """
         Constructor
         """
@@ -56,9 +57,14 @@ class Node2VecEmbeddingGenerator(EmbeddingGenerator):
     """
 
     """
+    P_DEFAULT = 2
+    Q_DEFAULT = 1
+    WALK_LENGTH = 80
+    NUM_WALKS = 10
+    WORKERS = 8
 
-    def __init__(self, nx_network, p=2, q=1, dimensions=1024,
-                 walk_length=80, num_walks=80, workers=8):
+    def __init__(self, nx_network, p=P_DEFAULT, q=Q_DEFAULT, dimensions=EmbeddingGenerator.DIMENSIONS,
+                 walk_length=WALK_LENGTH, num_walks=NUM_WALKS, workers=WORKERS):
         """
         Constructor
         """
@@ -210,6 +216,17 @@ class CellMapsPPIEmbedder(object):
             self._skip_logging = False
         else:
             self._skip_logging = skip_logging
+
+        if self._input_data_dict is None or not self._input_data_dict:
+            self._input_data_dict = {'outdir': self._outdir,
+                                     'inputdir': self._inputdir,
+                                     'embedding_generator': str(self._embedding_generator),
+                                     'name': self._name,
+                                     'project_name': self._project_name,
+                                     'organization_name': self._organization_name,
+                                     'skip_logging': self._skip_logging,
+                                     'provenance': str(self._provenance)
+                                     }
 
         logger.debug('In constructor')
 
