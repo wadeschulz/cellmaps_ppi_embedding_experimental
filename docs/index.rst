@@ -1,7 +1,7 @@
 ==========================
 Cell Maps PPI Embedder
 ==========================
-
+**The Cell Maps PPI Embedder is part of the Cell Mapping Toolkit**
 
 .. image:: https://img.shields.io/pypi/v/cellmaps_ppi_embedding.svg
         :target: https://pypi.python.org/pypi/cellmaps_ppi_embedding
