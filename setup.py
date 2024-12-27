@@ -27,11 +27,10 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['scipy<1.13.0',
-                'cellmaps_utils',
-                'node2vec',
-                'networkx',
-                'scipy<1.13.0']
+requirements = ['scipy>=1.10.1,<1.13',
+                'cellmaps_utils>=0.4.0,<1.0.0',
+                'node2vec>=0.4.6,<0.5.0',
+                'networkx>=2.8,<2.9']
 
 setup_requirements = [ ]
 
