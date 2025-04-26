@@ -46,6 +46,7 @@ Installation
 
    git clone https://github.com/idekerlab/cellmaps_ppi_embedding
    cd cellmaps_ppi_embedding
+   pip install -r requirements_dev.txt
    make dist
    pip install dist/cellmaps_ppi_embedding*whl
 
