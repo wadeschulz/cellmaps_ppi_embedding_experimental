@@ -184,16 +184,61 @@ class CellMapsPPIEmbedder(object):
 
         :param outdir: directory where ppi embeddings will be saved
         :type outdir: str
-        :param embedding_generator:
-        :type embedding_generator:
-        :param inputdir:
-        :type inputdir: str
+        :param embedding_generator: Object responsible for generating the embeddings.
+                                    Must implement `get_next_embedding()`, typically an
+                                    instance of a subclass of :py:class:`~EmbeddingGenerator`, such as
+                                    :py:class:`~Node2VecEmbeddingGenerator` or :py:class:`~FakeEmbeddingGenerator`.
+        :type embedding_generator: :py:class:`~EmbeddingGenerator`
+        :param inputdir: Input directory that contains ppi edgelist file and its RO-Crate metadata file.
+        :type inputdir: str or None
         :param skip_logging: If ``True`` skip logging, if ``None`` or ``False`` do NOT skip logging
         :type skip_logging: bool
-        :param provenance:
-        :type provenance: dict
-        :param input_data_dict:
-        :type input_data_dict: dict
+        :param name: Optional display name for the dataset. If not provided, the name will
+                     be inferred from the RO-Crate metadata or provenance dictionary.
+        :type name: str or None
+        :param organization_name: Optional name of the organization generating the dataset.
+                          Used in provenance tracking. Falls back to RO-Crate or provenance input if missing.
+        :type organization_name: str or None
+        :param project_name: Optional name of the project associated with the dataset.
+                     Used in provenance tracking. Falls back to RO-Crate or provenance input if missing.
+        :type project_name: str or None
+        :param provenance_utils: Utility class used for RO-Crate generation and FAIRSCAPE
+                                 dataset, software, and computation registration. Defaults to a new
+                                 :py:class:`~ProvenanceUtil`.
+        :type provenance_utils: :py:class:`~ProvenanceUtil`
+        :param input_data_dict: Dictionary of parameters and their values that capture the
+                                configuration used to generate the embeddings. This is serialized
+                                in the task metadata for reproducibility. If not provided, one is
+                                auto-generated from available parameters.
+
+                                Example:
+
+                                .. code-block:: python
+
+                                    {'outdir': '/output/path', 'inputdir': '/input/path'}
+        :type input_data_dict: dict or None
+        :param provenance: Optional dictionary specifying provenance metadata. Required if
+                           `inputdir` does not contain an RO-Crate. Used to describe the
+                           input edgelist, dataset authorship, and context.
+
+                           Example:
+
+                           .. code-block:: python
+
+                               {
+                                   'name': 'Example PPI Dataset',
+                                   'organization-name': 'CM4AI',
+                                   'project-name': 'Network Embedding',
+                                   'description': 'Node2Vec embeddings of protein-protein interactions',
+                                   'keywords': ['PPI', 'embedding', 'node2vec'],
+                                   'edgelist': {
+                                       'name': 'PPI Edgelist File',
+                                       'author': 'Krogan Lab',
+                                       'version': '1.0',
+                                       'data-format': 'tsv'
+                                   }
+                               }
+        :type provenance: dict or None
         """
         if outdir is None:
             raise CellMapsPPIEmbeddingError('outdir is None')
