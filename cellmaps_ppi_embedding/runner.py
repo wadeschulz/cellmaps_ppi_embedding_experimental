@@ -489,8 +489,8 @@ class CellMapsPPIEmbedder(object):
 
             with open(self.get_ppi_embedding_file(), 'w', newline='') as f:
                 writer = csv.writer(f, delimiter='\t')
-                header_line = ['']
-                header_line.extend([x for x in range(1, self._embedding_generator.get_dimensions())])
+                header_line = ['id']
+                header_line.extend([x for x in range(self._embedding_generator.get_dimensions())])
                 writer.writerow(header_line)
                 for row in self._embedding_generator.get_next_embedding():
                     writer.writerow(row)
