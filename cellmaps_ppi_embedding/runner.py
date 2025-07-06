@@ -12,6 +12,8 @@ from cellmaps_utils import constants
 from cellmaps_utils import logutils
 from cellmaps_utils.provenance import ProvenanceUtil
 import warnings
+from gensim.models.callbacks import CallbackAny2Vec
+import mlflow
 
 import cellmaps_ppi_embedding
 from cellmaps_ppi_embedding.exceptions import CellMapsPPIEmbeddingError
@@ -53,6 +55,31 @@ class EmbeddingGenerator(object):
         raise NotImplementedError('Subclasses should implement')
 
 
+class LossLogger(CallbackAny2Vec):
+    def __init__(self):
+        self.epoch = 0
+        self.cumulative_loss = 0.0
+        self.epoch_losses = []
+    
+    def on_epoch_end(self, model):
+        latest_cumulative = model.get_latest_training_loss()
+        if self.epoch == 0:
+            epoch_loss = latest_cumulative
+        else:
+            epoch_loss = latest_cumulative - self.cumulative_loss
+        self.epoch_losses.append(epoch_loss)
+        self.cumulative_loss = latest_cumulative
+        mlflow.log_metrics(
+            metrics={
+                "total_loss": latest_cumulative,
+                "epoch_loss": epoch_loss
+            },
+            step=self.epoch
+        )
+        print(f"Epoch {self.epoch} | Loss: {epoch_loss}")
+        self.epoch += 1
+
+
 class Node2VecEmbeddingGenerator(EmbeddingGenerator):
     """
 
@@ -62,9 +89,15 @@ class Node2VecEmbeddingGenerator(EmbeddingGenerator):
     WALK_LENGTH = 80
     NUM_WALKS = 10
     WORKERS = 8
+    SEED = None
+    WINDOW = 10
+    MIN_COUNT = 0
+    SG = 1
+    EPOCHS = 1
 
     def __init__(self, nx_network, p=P_DEFAULT, q=Q_DEFAULT, dimensions=EmbeddingGenerator.DIMENSIONS,
-                 walk_length=WALK_LENGTH, num_walks=NUM_WALKS, workers=WORKERS):
+                 walk_length=WALK_LENGTH, num_walks=NUM_WALKS, workers=WORKERS, seed=SEED,
+                 window=WINDOW, min_count=MIN_COUNT, sg=SG, epochs=EPOCHS, log_fairops=False):
         """
         Constructor
         """
@@ -75,6 +108,31 @@ class Node2VecEmbeddingGenerator(EmbeddingGenerator):
         self._walk_length = walk_length
         self._num_walks = num_walks
         self._workers = workers
+        self._seed = seed
+        self._window = window
+        self._min_count = min_count
+        self._sg = sg
+        self._epochs = epochs
+        self._log_fairops = log_fairops
+
+        if self._log_fairops:
+            import mlflow
+
+            mlflow.log_params(
+                {
+                    "dimensions": dimensions,
+                    "p": p,
+                    "q": q,
+                    "walk_length": walk_length,
+                    "num_walks": num_walks,
+                    "workers": workers,
+                    "seed": seed,
+                    "window": window,
+                    "min_count": min_count,
+                    "sg": sg,
+                    "epochs": epochs
+                }
+            )
 
     def _remove_header_edge_from_network(self):
         """
@@ -102,13 +160,24 @@ class Node2VecEmbeddingGenerator(EmbeddingGenerator):
 
         n2v_obj = Node2Vec(self._nx_network, dimensions=self._dimensions,
                            walk_length=self._walk_length,
-                           num_walks=self._num_walks,
-                           workers=self._workers, q=self._q, p=self._p)
+                           num_walks=self._num_walks, workers=self._workers,
+                           q=self._q, p=self._p, seed=self._seed)
+
+        callbacks = []
+        compute_loss = False
+        if self._log_fairops:
+            compute_loss = True
+            loss_logger = LossLogger()
+            callbacks = [loss_logger]
 
         # Embed nodes
-        model = n2v_obj.fit(window=10, min_count=0, sg=1, epochs=1)
+        model = n2v_obj.fit(
+            window=self._window, min_count=self._min_count,
+            sg=self._sg, epochs=self._epochs,
+            compute_loss=compute_loss, callbacks=callbacks
+        )
         for key in model.wv.index_to_key:
-            row = [key]
+            row = [key.strip()]
             row.extend(model.wv[key].tolist())
             yield row
 
