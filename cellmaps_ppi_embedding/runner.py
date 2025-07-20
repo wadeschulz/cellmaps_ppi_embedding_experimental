@@ -13,12 +13,19 @@ from cellmaps_utils import logutils
 from cellmaps_utils.provenance import ProvenanceUtil
 import warnings
 from gensim.models.callbacks import CallbackAny2Vec
-import mlflow
 
 import cellmaps_ppi_embedding
 from cellmaps_ppi_embedding.exceptions import CellMapsPPIEmbeddingError
 
 logger = logging.getLogger(__name__)
+
+try:
+    import mlflow
+    MLFLOW_LOADED = True
+except ImportError as ie:
+    MLFLOW_LOADED = False
+    logger.debug('Unable to load MLFlow. Utilities '
+                 'relying on MLFlow will not work : ' + str(ie))
 
 
 class EmbeddingGenerator(object):
@@ -116,8 +123,6 @@ class Node2VecEmbeddingGenerator(EmbeddingGenerator):
         self._log_fairops = log_fairops
 
         if self._log_fairops:
-            import mlflow
-
             mlflow.log_params(
                 {
                     "dimensions": dimensions,
